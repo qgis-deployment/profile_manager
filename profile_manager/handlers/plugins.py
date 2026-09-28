@@ -71,13 +71,16 @@ def import_plugins(
 
     Plugins are stored in python/plugins/
     Their active state is tracked in QGIS/QGIS3.ini's [PythonPlugins] section, e.g.:
-    ...
-    [PythonPlugins]
-    ...
-    fooPlugin=true
-    PluggyBar=true
-    BaZ=false
-    ...
+
+    .. code-block:: ini
+
+       ...
+       [PythonPlugins]
+       ...
+       fooPlugin=true
+       PluggyBar=true
+       BaZ=false
+       ...
 
     Args:
         source_profile_path: Path of profile directory to import from

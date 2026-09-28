@@ -7,14 +7,17 @@ def import_bookmarks(source_bookmark_file: Path, target_bookmark_file: Path):
     """Imports spatial bookmarks from source to target file.
 
     Spatial bookmarks are stored in bookmarks.xml, e.g.:
-    <Bookmarks>
-        <Bookmark id="..." group="" extent="POLYGON((...))" name="Test Bookmark">
-            <spatialrefsys nativeFormat="Wkt">
-            ...
-            </spatialrefsys>
-        </Bookmark>
-        ...
-    </Bookmarks>
+
+    .. code-block:: ini
+
+       Bookmarks>
+           <Bookmark id="..." group="" extent="POLYGON((...))" name="Test Bookmark">
+               <spatialrefsys nativeFormat="Wkt">
+               ...
+               </spatialrefsys>
+           </Bookmark>
+           ...
+       </Bookmarks>
 
     TODO The deduplication seems garbage
 

@@ -6,12 +6,15 @@ def import_expressions(source_qgis_ini_file: Path, target_qgis_ini_file: Path):
     r"""Imports custom expressions from source to target profile.
 
     Custom expressions are stored in QGIS/QGIS3.ini's [expressions] section, e.g.:
-    ...
-    [expressions]
-    ...
-    user\test_expression\expression=1 + 1
-    user\test_expression\helpText="..."
-    ...
+
+    .. code-block:: ini
+
+       ...
+       [expressions]
+       ...
+       user\test_expression\expression=1 + 1
+       user\test_expression\helpText="..."
+       ...
 
     Note: This does not handle Python expression functions yet. TODO
 

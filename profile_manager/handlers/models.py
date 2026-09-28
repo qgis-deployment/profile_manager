@@ -9,10 +9,13 @@ def import_models(source_profile_path: Path, target_profile_path: Path):
     Note: Existing models with identical filenames will be overwritten!
 
     Models are stored in the processing/models/ subdirectory of a profile, e.g.:
-    ...
-    processing/models/my_model.model3
-    processing/models/das.model3
-    ...
+
+    .. code-block:: ini
+
+       ...
+       processing/models/my_model.model3
+       processing/models/das.model3
+       ...
 
     Args:
         source_profile_path: Path of profile directory to import from
