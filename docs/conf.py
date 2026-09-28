@@ -98,14 +98,7 @@ html_theme = "furo"
 # Sphinx API doc
 autodoc_mock_imports: list[str] = [
     "pyplugin_installer",
-    "qgis.core",
-    "qgis.gui",
-    "qgis.PyQt",
-    "qgis.PyQt.QtCore",
-    "qgis.PyQt.QtGui",
-    "qgis.PyQt.QtNetwork",
-    "qgis.PyQt.QtWidgets",
-    "qgis.utils",
+    "qgis",
 ]
 
 # Configuration for intersphinx (refer to others docs).
