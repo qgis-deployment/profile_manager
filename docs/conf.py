@@ -52,6 +52,7 @@ extensions: list[str] = [
     "sphinx.ext.viewcode",
     # 3rd party
     "myst_parser",
+    "sphinx.ext.napoleon",  # google style docstrings
     "sphinx_copybutton",
 ]
 
