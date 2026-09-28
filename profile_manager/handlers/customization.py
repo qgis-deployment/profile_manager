@@ -10,11 +10,13 @@ def import_customizations(source_profile_path: Path, target_profile_path: Path):
 
     TODO fix discrepancy between [UI] and [Customization]! Which one(s) exist and what do we want to transfer?
 
-    E.g.
-    [Customization]
-    Browser=true
-    Browser\AFS=false
-    ...
+     :example:
+
+      .. code-block:: ini
+        [Customization]
+        Browser=true
+        Browser\AFS=false
+        ...
 
     Args:
         source_profile_path: Path of profile directory to import from
