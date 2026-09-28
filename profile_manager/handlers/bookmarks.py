@@ -8,9 +8,9 @@ def import_bookmarks(source_bookmark_file: Path, target_bookmark_file: Path):
 
     Spatial bookmarks are stored in bookmarks.xml, e.g.:
 
-    .. code-block:: ini
+    .. code-block:: xml
 
-       Bookmarks>
+       <Bookmarks>
            <Bookmark id="..." group="" extent="POLYGON((...))" name="Test Bookmark">
                <spatialrefsys nativeFormat="Wkt">
                ...

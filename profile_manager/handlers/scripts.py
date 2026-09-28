@@ -10,7 +10,7 @@ def import_scripts(source_profile_path: Path, target_profile_path: Path):
 
     Scripts are stored in the processing/scripts/ subdirectory of a profile, e.g.:
 
-    .. code-block:: ini
+    .. code-block::
 
       ...
       processing/scripts/my_great_processing_script.py

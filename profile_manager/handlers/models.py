@@ -10,7 +10,7 @@ def import_models(source_profile_path: Path, target_profile_path: Path):
 
     Models are stored in the processing/models/ subdirectory of a profile, e.g.:
 
-    .. code-block:: ini
+    .. code-block::
 
        ...
        processing/models/my_model.model3
