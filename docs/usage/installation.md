@@ -1,6 +1,6 @@
 # Installation
 
-## Stable version (recomended)
+## Stable version (recommended)
 
 This plugin is published on the official QGIS plugins repository: <https://plugins.qgis.org/plugins/profile_manager/>.
 
