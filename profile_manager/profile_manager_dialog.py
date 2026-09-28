@@ -29,9 +29,9 @@ from profile_manager.qdt_export.profile_export import (
 from profile_manager.utils import wait_cursor
 
 
-FORM_CLASS, _ = uic.loadUiType(
+FORM_CLASS = uic.loadUiType(
     Path(__file__).parent.absolute() / "profile_manager_dialog_base.ui"
-)
+)[0]
 
 
 class ProfileManagerDialog(QtWidgets.QDialog, FORM_CLASS):
