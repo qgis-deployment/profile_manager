@@ -4,7 +4,7 @@ from shutil import copy2
 
 
 def import_customizations(source_profile_path: Path, target_profile_path: Path):
-    """Imports UI customizations from source to target profile.
+    r"""Imports UI customizations from source to target profile.
 
     Copies the whole QGISCUSTOMIZATION3.ini file and also transfers the [UI] section from QGIS3.ini if available
 
@@ -13,7 +13,7 @@ def import_customizations(source_profile_path: Path, target_profile_path: Path):
     E.g.
     [Customization]
     Browser=true
-    Browser\\AFS=false
+    Browser\AFS=false
     ...
 
     Args:

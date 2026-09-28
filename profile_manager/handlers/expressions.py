@@ -3,14 +3,14 @@ from pathlib import Path
 
 
 def import_expressions(source_qgis_ini_file: Path, target_qgis_ini_file: Path):
-    """Imports custom expressions from source to target profile.
+    r"""Imports custom expressions from source to target profile.
 
     Custom expressions are stored in QGIS/QGIS3.ini's [expressions] section, e.g.:
     ...
     [expressions]
     ...
-    user\\test_expression\\expression=1 + 1
-    user\\test_expression\\helpText="..."
+    user\test_expression\expression=1 + 1
+    user\test_expression\helpText="..."
     ...
 
     Note: This does not handle Python expression functions yet. TODO
