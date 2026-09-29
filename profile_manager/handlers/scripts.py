@@ -1,4 +1,3 @@
-from os import listdir
 from pathlib import Path
 from shutil import copy2
 
@@ -23,14 +22,14 @@ def import_scripts(source_profile_path: Path, target_profile_path: Path):
     """
     source_scripts_dir = source_profile_path / "processing" / "scripts"
     target_scripts_dir = target_profile_path / "processing" / "scripts"
+
     if not source_scripts_dir.exists():
         return
+
     if not target_scripts_dir.exists():
         target_scripts_dir.mkdir(parents=True, exist_ok=True)
-    for item in listdir(source_scripts_dir):
-        source = source_scripts_dir / item
-        dest = target_scripts_dir / item
-        if source.is_dir():
-            continue
-        else:
-            copy2(source, dest)
+
+    for python_file in Path(source_scripts_dir).glob("*.py"):
+        filename = python_file.name
+        dest = target_scripts_dir / filename
+        copy2(python_file, dest)
