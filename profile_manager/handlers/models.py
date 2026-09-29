@@ -1,6 +1,11 @@
 from pathlib import Path
 from shutil import copy2
 
+from profile_manager.toolbelt.log_handler import PlgLogger
+
+
+logger = PlgLogger()
+
 
 def import_models(source_profile_path: Path, target_profile_path: Path):
     """Imports Processing models from source to target profile.
@@ -31,5 +36,6 @@ def import_models(source_profile_path: Path, target_profile_path: Path):
 
     for model_file in Path(source_models_dir).glob("*.model3"):
         filename = model_file.name
+        logger.log(f"Copying model file: {filename}")
         dest = target_models_dir / filename
         copy2(model_file, dest)
