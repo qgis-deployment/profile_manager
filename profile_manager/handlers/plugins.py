@@ -28,10 +28,7 @@ CORE_PLUGINS = [
 
 def collect_plugin_names(qgis_ini_file: Path) -> list[str]:
     # TODO use ini AND file system, ini might have empty leftovers...
-    logger.log(
-        log_level=Qgis.MessageLevel.Info,
-        message=f"Collecting plugin names from  {qgis_ini_file}",
-    )
+    logger.log(f"Collecting plugin names from  {qgis_ini_file}")
     start_time = datetime.now()
 
     ini_parser = RawConfigParser()
@@ -88,10 +85,7 @@ def import_plugins(
         target_qgis_ini_file: Path of target QGIS3.ini file to import to
         plugin_names: List of plugins (names according to QGIS3.ini) to import
     """
-    logger.log(
-        log_level=Qgis.MessageLevel.Info,
-        message=f"Importing {len(plugin_names)} data sources to {target_profile_path}",
-    )
+    logger.log(f"Importing {len(plugin_names)} data sources to {target_profile_path}")
     start_time = datetime.now()
 
     ini_parser = RawConfigParser()
@@ -142,10 +136,7 @@ def remove_plugins(
         qgis_ini_file: Path of target QGIS3.ini file to remove from
         plugin_names: List of plugins (names according to QGIS3.ini) to remove
     """
-    logger.log(
-        log_level=Qgis.MessageLevel.Info,
-        message=f"Removing {len(plugin_names)} data sources from {profile_path}",
-    )
+    logger.log(f"Removing {len(plugin_names)} data sources from {profile_path}")
     start_time = datetime.now()
 
     ini_parser = RawConfigParser()
