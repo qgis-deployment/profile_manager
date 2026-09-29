@@ -2,6 +2,11 @@ from pathlib import Path
 
 from lxml import etree as et
 
+from profile_manager.toolbelt import PlgLogger
+
+
+logger = PlgLogger()
+
 
 def import_bookmarks(source_bookmark_file: Path, target_bookmark_file: Path):
     """Imports spatial bookmarks from source to target file.
@@ -41,8 +46,14 @@ def import_bookmarks(source_bookmark_file: Path, target_bookmark_file: Path):
     for source_bookmark in source_bookmarks:
         source_bookmark_id = source_bookmark.attrib["id"]
         if source_bookmark.attrib["id"] in target_bookmark_ids:
+            logger.log(
+                message=f"Skipping duplicate bookmark: {source_bookmark.attrib['name']} ({source_bookmark_id})"
+            )
             continue
         else:
+            logger.log(
+                message=f"Writing bookmark: {source_bookmark.attrib['name']} ({source_bookmark_id})"
+            )
             target_tree_root.append(source_bookmark)
 
     et.ElementTree(target_tree_root).write(
