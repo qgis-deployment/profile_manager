@@ -396,6 +396,8 @@ class ProfileManager:
 
         self.__refresh_qgis_browser_panels()
 
+        return error_messages
+
     def remove_things(
         self, data_sources: dict[str, list[str]], plugins: list[str]
     ) -> list[str]:
