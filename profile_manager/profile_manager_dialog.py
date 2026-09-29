@@ -29,20 +29,12 @@ from profile_manager.qdt_export.profile_export import (
 from profile_manager.utils import wait_cursor
 
 
-FORM_CLASS, _ = uic.loadUiType(
-    Path(__file__).parent.absolute() / "profile_manager_dialog_base.ui"
-)
-
-
-class ProfileManagerDialog(QtWidgets.QDialog, FORM_CLASS):
+class ProfileManagerDialog(QtWidgets.QDialog):
     def __init__(self, profile_manager, parent=None):
         super().__init__(parent)
-        # Set up the user interface from Designer through FORM_CLASS.
-        # After self.setupUi() you can access any designer object by doing
-        # self.<objectname>, and you can use autoconnect slots - see
-        # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
-        # #widgets-and-dialogs-with-auto-connect
-        self.setupUi(self)
+        uic.loadUi(
+            Path(__file__).parent.absolute() / "profile_manager_dialog_base.ui", self
+        )
 
         self.__profile_manager = profile_manager
         self.__everything_is_checked = False

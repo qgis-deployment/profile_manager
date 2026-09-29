@@ -95,23 +95,26 @@ def collect_data_sources_of_provider(
 ) -> dict[str, dict[str, dict[str, str]]]:
     """Returns all data source connections of the specified provider in the INI file.
 
-    For example:
-    {
-        "data_source_name1": {
-            "section1": {
-                "option1": "value1",
-                "option2": "value2",
-                ...
-            },
-            "section2": {
-                ...
-            },
-        },
-        "data_source_name2": {
-            ...
-        },
-        .
-    }
+    Pseudo example:
+
+    .. code-block:: python
+
+       {
+           "data_source_name1": {
+               "section1": {
+                   "option1": "value1",
+                   "option2": "value2",
+                   ...
+               },
+               "section2": {
+                   ...
+               },
+           },
+           "data_source_name2": {
+               ...
+           },
+           ...
+       }
 
     Args:
         ini_path (str): Path of the INI file to read

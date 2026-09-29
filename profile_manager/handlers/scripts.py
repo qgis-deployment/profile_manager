@@ -9,10 +9,13 @@ def import_scripts(source_profile_path: Path, target_profile_path: Path):
     Note: Existing scripts with identical filenames will be overwritten!
 
     Scripts are stored in the processing/scripts/ subdirectory of a profile, e.g.:
-    ...
-    processing/scripts/my_great_processing_script.py
-    processing/scripts/snakes.py
-    ...
+
+    .. code-block::
+
+      ...
+      processing/scripts/my_great_processing_script.py
+      processing/scripts/snakes.py
+      ...
 
     Args:
         source_profile_path: Path of profile directory to import from
