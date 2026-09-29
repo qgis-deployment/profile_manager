@@ -1,6 +1,11 @@
 from pathlib import Path
 from shutil import copy2
 
+from profile_manager.toolbelt.log_handler import PlgLogger
+
+
+logger = PlgLogger()
+
 
 def import_scripts(source_profile_path: Path, target_profile_path: Path):
     """Imports Processing scripts from source to target profile.
@@ -31,5 +36,6 @@ def import_scripts(source_profile_path: Path, target_profile_path: Path):
 
     for python_file in Path(source_scripts_dir).glob("*.py"):
         filename = python_file.name
+        logger.log(f"Copying Processing python script: {filename}")
         dest = target_scripts_dir / filename
         copy2(python_file, dest)
