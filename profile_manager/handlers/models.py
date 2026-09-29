@@ -1,4 +1,3 @@
-from os import listdir
 from pathlib import Path
 from shutil import copy2
 
@@ -26,12 +25,11 @@ def import_models(source_profile_path: Path, target_profile_path: Path):
 
     if not source_models_dir.exists():
         return
+
     if not target_models_dir.exists():
         target_models_dir.mkdir(parents=True, exist_ok=True)
-    for item in listdir(source_models_dir):
-        source = source_models_dir / item
-        dest = target_models_dir / item
-        if source.is_dir():
-            continue
-        else:
-            copy2(source, dest)
+
+    for model_file in Path(source_models_dir).glob("*.model3"):
+        filename = model_file.name
+        dest = target_models_dir / filename
+        copy2(model_file, dest)
