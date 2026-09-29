@@ -1,5 +1,11 @@
-from configparser import RawConfigParser
 from pathlib import Path
+
+from qgis.PyQt.QtCore import QSettings
+
+from profile_manager.toolbelt.log_handler import PlgLogger
+
+
+logger = PlgLogger()
 
 
 def import_expressions(source_qgis_ini_file: Path, target_qgis_ini_file: Path):
@@ -16,28 +22,46 @@ def import_expressions(source_qgis_ini_file: Path, target_qgis_ini_file: Path):
        user\test_expression\helpText="..."
        ...
 
-    Note: This does not handle Python expression functions yet. TODO
+    Note: This does not handle Python expression functions.
 
     Args:
-        source_qgis_ini_file (str): Path of source QGIS3.ini file
-        target_qgis_ini_file (str): Path of target QGIS3.ini file
+        source_qgis_ini_file: Path of source QGIS3.ini file
+        target_qgis_ini_file: Path of target QGIS3.ini file
     """
-    source_ini_parser = RawConfigParser()
-    source_ini_parser.optionxform = str  # str = case-sensitive option names
-    source_ini_parser.read(source_qgis_ini_file)
+    # Note: We are using QSettings because that will handle all the specialities
+    #       of Qt's INI format for us. A standard INI parser (like configparser)
+    #       would require extra work, e.g. for the child groups or percent encodings.
+    source_settings = QSettings(str(source_qgis_ini_file), QSettings.Format.IniFormat)
+    target_settings = QSettings(str(target_qgis_ini_file), QSettings.Format.IniFormat)
 
-    expressions = dict(source_ini_parser.items("expressions"))
+    # go into the "user" group of the "expressions" section
+    source_settings.beginGroup("expressions/user")
+    if not source_settings.childGroups():
+        logger.log("No expressions found in source profile")
+        return
 
-    target_ini_parser = RawConfigParser()
-    target_ini_parser.optionxform = str  # str = case-sensitive option names
-    target_ini_parser.read(target_qgis_ini_file)
+    target_settings.beginGroup("expressions/user")  # will be created as needed
 
-    if not target_ini_parser.has_section("expressions"):
-        target_ini_parser["expressions"] = {}
+    # Expressions use two lines each, as child groups:
+    # - expressions/user/FOO/expression
+    # - expressions/user/FOO/helpText
+    # - expressions/user/BAR/expression
+    # - expressions/user/BAR/helpText
+    # - expressions/user/BAZ/*
+    # - expressions/user/OOF/*
+    # = FOO, BAR, BAZ, OOF are child groups
+    for source_expression_group in source_settings.childGroups():
+        source_expression_name = source_expression_group
+        logger.log(f"Copying expression: {source_expression_name}")
 
-    for entry in expressions:
-        if "expression" in entry or "helpText" in entry:
-            target_ini_parser.set("expressions", entry, expressions[entry])
+        source_settings.beginGroup(source_expression_name)
+        source_expression_expression = source_settings.value("expression")
+        source_expression_helptext = source_settings.value("helpText")
+        source_settings.endGroup()
 
-    with open(target_qgis_ini_file, "w") as qgisconf:
-        target_ini_parser.write(qgisconf, space_around_delimiters=False)
+        target_settings.beginGroup(source_expression_name)
+        target_settings.setValue("expression", source_expression_expression)
+        target_settings.setValue("helpText", source_expression_helptext)
+        target_settings.endGroup()
+
+    # writing the target file is handled by QSettings’s destructor
