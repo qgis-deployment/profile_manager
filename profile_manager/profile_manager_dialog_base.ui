@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>739</width>
-    <height>473</height>
+    <height>519</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,7 +29,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_profiles">
       <attribute name="title">
@@ -202,7 +202,7 @@
        <item>
         <widget class="QTabWidget" name="tabWidget_2">
          <property name="currentIndex">
-          <number>0</number>
+          <number>2</number>
          </property>
          <widget class="QWidget" name="tab_inner_datasources">
           <attribute name="title">
@@ -335,6 +335,13 @@
              <widget class="QCheckBox" name="expressions_check">
               <property name="text">
                <string>Expressions</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="python_expressions_check">
+              <property name="text">
+               <string>Python Expression Functions</string>
               </property>
              </widget>
             </item>

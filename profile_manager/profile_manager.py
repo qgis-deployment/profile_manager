@@ -32,6 +32,7 @@ from profile_manager.handlers.plugins import (
     import_plugins,
     remove_plugins,
 )
+from profile_manager.handlers.python_expressions import import_python_expressions
 from profile_manager.handlers.scripts import import_scripts
 from profile_manager.handlers.styles import import_styles
 from profile_manager.profile_manager_dialog import ProfileManagerDialog
@@ -249,6 +250,7 @@ class ProfileManager:
         do_import_scripts: bool,
         do_import_styles: bool,
         do_import_expressions: bool,
+        do_import_python_expressions: bool,
         do_import_customizations: bool,
     ) -> list[str]:
         """Handles import of all things supported."""
@@ -377,6 +379,21 @@ class ProfileManager:
             except Exception as e:
                 error_messages.append(
                     self.tr("Error while importing expressions: {}").format(e)
+                )
+
+        if do_import_python_expressions:
+            QgsMessageLog.logMessage(
+                self.tr("Importing Python expressions..."),
+                __title__,
+                level=Qgis.MessageLevel.Info,
+            )
+            try:
+                import_python_expressions(
+                    self.source_profile_path, self.target_profile_path
+                )
+            except Exception as e:
+                error_messages.append(
+                    self.tr("Error while importing Python expressions: {}").format(e)
                 )
 
         if do_import_customizations:
