@@ -156,6 +156,7 @@ class ProfileManagerDialog(QtWidgets.QDialog):
             self.customization_check,
             self.favourites_check,
             self.expressions_check,
+            self.python_expressions_check,
             self.models_check,
             self.scripts_check,
             self.styles_check,
@@ -270,6 +271,7 @@ class ProfileManagerDialog(QtWidgets.QDialog):
                 self.scripts_check.isChecked(),
                 self.styles_check.isChecked(),
                 self.expressions_check.isChecked(),
+                self.python_expressions_check.isChecked(),
                 self.customization_check.isChecked(),
             ]
         )
@@ -444,6 +446,7 @@ class ProfileManagerDialog(QtWidgets.QDialog):
             self.scripts_check,
             self.styles_check,
             self.expressions_check,
+            self.python_expressions_check,
             self.checkBox_checkAll,
             self.customization_check,
         ]
@@ -697,6 +700,7 @@ class ProfileManagerDialog(QtWidgets.QDialog):
                 do_import_scripts=self.scripts_check.isChecked(),
                 do_import_styles=self.styles_check.isChecked(),
                 do_import_expressions=self.expressions_check.isChecked(),
+                do_import_python_expressions=self.python_expressions_check.isChecked(),
                 do_import_customizations=self.customization_check.isChecked(),
             )
 
