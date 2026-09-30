@@ -29,6 +29,7 @@ def import_scripts(source_profile_path: Path, target_profile_path: Path):
     target_scripts_dir = target_profile_path / "processing" / "scripts"
 
     if not source_scripts_dir.exists():
+        logger.log("No Processing python scripts found in source profile")
         return
 
     if not target_scripts_dir.exists():
