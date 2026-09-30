@@ -40,14 +40,12 @@ def import_customizations(source_profile_path: Path, target_profile_path: Path):
     target_settings = QSettings(
         str(target_profile_path / "QGIS" / "QGIS3.ini"), QSettings.Format.IniFormat
     )
-    source_settings.beginGroup("UI/Customization")
-    target_settings.beginGroup("UI/Customization")
-    customization_setting = source_settings.value("enabled")  # None if not exist
+    customization_setting = source_settings.value("UI/Customization/enabled", type=bool)
     if customization_setting is True:
-        target_settings.setValue("enabled", True)
+        target_settings.setValue("UI/Customization/enabled", True)
         logger.log("Enabling UI customization in target profile")
     elif customization_setting is False:
-        target_settings.setValue("enabled", False)
+        target_settings.setValue("UI/Customization/enabled", False)
         logger.log("Disabling UI customization in target profile")
 
     # writing the target file is handled by QSettings’s destructor
