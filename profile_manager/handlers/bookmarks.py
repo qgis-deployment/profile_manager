@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from lxml import etree as et
+from qgis.core import QgsBookmarkManager
 
 from profile_manager.toolbelt import PlgLogger
 
@@ -11,54 +11,49 @@ logger = PlgLogger()
 def import_bookmarks(source_bookmark_file: Path, target_bookmark_file: Path):
     """Imports spatial bookmarks from source to target file.
 
-    Skips bookmarks by id (uuid) that already exist in the target. QGIS allows
+    Existing bookmarks will be updated/overwritten when IDs match.
 
-    Spatial bookmarks are stored in bookmarks.xml, e.g.:
+    Spatial bookmarks are stored in bookmarks.xml.
 
-    .. code-block:: xml
-
-       <Bookmarks>
-           <Bookmark id="..." group="" extent="POLYGON((...))" name="Test Bookmark">
-               <spatialrefsys nativeFormat="Wkt">
-               ...
-               </spatialrefsys>
-           </Bookmark>
-           ...
-       </Bookmarks>
+    Note: QGIS does only flush edits to the bookmarks file when closed, so any edits
+          to bookmarks in the same session as a Profile Manager import will not be
+          reflected in the target file.
 
     Args:
         source_bookmark_file: Path of bookmarks file to import from
         target_bookmark_file: Path of bookmarks file to import to
     """
-    source_tree = et.parse(source_bookmark_file, et.XMLParser(remove_blank_text=True))
+    # This function *could* use QgsApplication.bookmarkManager() as source but let's
+    # keep it similar to the other functions and have similar source and target
+    # parameters. The benefit would be that bookmark changes during the same QGIS
+    # session as the Profile Manager import would be included.
+    # TODO reconsider this ^
 
-    if not target_bookmark_file.is_file():
-        with open(target_bookmark_file, "w") as new_file:
-            new_file.write("<Bookmarks></Bookmarks>")
+    # There is also a method QgsBookmarkManager.importFromFile() that might look
+    # relevant but that's for bookmark *exports* which use a different XML format.
 
-    target_tree = et.parse(target_bookmark_file, et.XMLParser(remove_blank_text=True))
+    source_bmm = QgsBookmarkManager()
+    source_bmm.initialize(str(source_bookmark_file))
 
-    source_bookmarks = source_tree.findall("Bookmark")
-    target_tree_root = target_tree.getroot()  # The <Bookmarks> element
-    target_bookmarks = target_tree.findall("Bookmark")
+    target_bmm = QgsBookmarkManager()
+    target_bmm.initialize(str(target_bookmark_file))
 
-    target_bookmark_ids = [tb.attrib["id"] for tb in target_bookmarks]
-    for source_bookmark in source_bookmarks:
-        source_bookmark_id = source_bookmark.attrib["id"]
-        if source_bookmark.attrib["id"] in target_bookmark_ids:
-            logger.log(
-                message=f"Skipping duplicate bookmark: {source_bookmark.attrib['name']} ({source_bookmark_id})"
-            )
-            continue
+    logger.log(f"Importing {len(source_bmm.bookmarks())} bookmarks...")
+    for bookmark in source_bmm.bookmarks():
+        # addBookmark() fails if ID exists and updateBookmark() fails if it doesn't.
+        # addBookmark() says it can also fail due to other reasons, so we cannot
+        # simply try that first and do updateBookmark() on fail.
+        # bookmarkById() returns an empty bookmark if not found, there is no
+        # other way to find out if a bookmark already exists in the target.
+        # An empty bookmark has no special marker but an empty string as ID.
+        # So, this is why this is written as it is:
+        target_bookmark = target_bmm.bookmarkById(bookmark.id())
+        if target_bookmark.id() == "":
+            # ID does not exist in target, we should copy the bookmark to it
+            bookmark_id, success = target_bmm.addBookmark(bookmark)
+            assert success
         else:
-            logger.log(
-                message=f"Writing bookmark: {source_bookmark.attrib['name']} ({source_bookmark_id})"
-            )
-            target_tree_root.append(source_bookmark)
+            # ID exists in target so updateBookmark() will be able to replace it
+            assert target_bmm.updateBookmark(bookmark)
 
-    et.ElementTree(target_tree_root).write(
-        target_bookmark_file,
-        pretty_print=True,
-        encoding="utf-8",
-        xml_declaration=True,
-    )
+    del target_bmm  # flush the target file
