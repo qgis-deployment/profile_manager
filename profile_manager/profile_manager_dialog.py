@@ -159,7 +159,7 @@ class ProfileManagerDialog(QtWidgets.QDialog):
             self.python_expressions_check,
             self.models_check,
             self.scripts_check,
-            self.styles_check,
+            self.style_items_check,
         ]
         for checkbox in checkboxes:
             checkbox.stateChanged.connect(self.__conditionally_enable_import_buttons)
@@ -269,7 +269,7 @@ class ProfileManagerDialog(QtWidgets.QDialog):
                 self.favourites_check.isChecked(),
                 self.models_check.isChecked(),
                 self.scripts_check.isChecked(),
-                self.styles_check.isChecked(),
+                self.style_items_check.isChecked(),
                 self.expressions_check.isChecked(),
                 self.python_expressions_check.isChecked(),
                 self.customization_check.isChecked(),
@@ -444,7 +444,7 @@ class ProfileManagerDialog(QtWidgets.QDialog):
             self.favourites_check,
             self.models_check,
             self.scripts_check,
-            self.styles_check,
+            self.style_items_check,
             self.expressions_check,
             self.python_expressions_check,
             self.checkBox_checkAll,
@@ -698,7 +698,7 @@ class ProfileManagerDialog(QtWidgets.QDialog):
                 do_import_favourites=self.favourites_check.isChecked(),
                 do_import_models=self.models_check.isChecked(),
                 do_import_scripts=self.scripts_check.isChecked(),
-                do_import_styles=self.styles_check.isChecked(),
+                do_import_style_items=self.style_items_check.isChecked(),
                 do_import_expressions=self.expressions_check.isChecked(),
                 do_import_python_expressions=self.python_expressions_check.isChecked(),
                 do_import_customizations=self.customization_check.isChecked(),

@@ -34,7 +34,7 @@ from profile_manager.handlers.plugins import (
 )
 from profile_manager.handlers.python_expressions import import_python_expressions
 from profile_manager.handlers.scripts import import_scripts
-from profile_manager.handlers.styles import import_styles
+from profile_manager.handlers.styles import import_style_items
 from profile_manager.profile_manager_dialog import ProfileManagerDialog
 from profile_manager.profiles.profile_handler import (
     copy_profile,
@@ -244,7 +244,7 @@ class ProfileManager:
         do_import_favourites: bool,
         do_import_models: bool,
         do_import_scripts: bool,
-        do_import_styles: bool,
+        do_import_style_items: bool,
         do_import_expressions: bool,
         do_import_python_expressions: bool,
         do_import_customizations: bool,
@@ -329,13 +329,13 @@ class ProfileManager:
                     self.tr("Error while importing scripts: {}").format(e)
                 )
 
-        if do_import_styles:
-            self.log(self.tr("Importing styles..."))
+        if do_import_style_items:
+            self.log(self.tr("Importing style items..."))
             try:
-                import_styles(self.source_profile_path, self.target_profile_path)
+                import_style_items(self.source_profile_path, self.target_profile_path)
             except Exception as e:
                 error_messages.append(
-                    self.tr("Error while importing styles: {}").format(e)
+                    self.tr("Error while importing style items: {}").format(e)
                 )
 
         if do_import_expressions:
