@@ -38,8 +38,13 @@ def import_bookmarks(source_bookmark_file: Path, target_bookmark_file: Path):
     target_bmm = QgsBookmarkManager()
     target_bmm.initialize(str(target_bookmark_file))
 
-    logger.log(f"Importing {len(source_bmm.bookmarks())} bookmarks...")
-    for bookmark in source_bmm.bookmarks():
+    source_bookmarks = source_bmm.getBookmarks()
+    if not source_bookmarks:
+        logger.log("No bookmarks found in source profile")
+        return
+
+    logger.log(f"Importing {len(source_bookmarks)} bookmarks...")
+    for bookmark in source_bookmarks:
         # addBookmark() fails if ID exists and updateBookmark() fails if it doesn't.
         # addBookmark() says it can also fail due to other reasons, so we cannot
         # simply try that first and do updateBookmark() on fail.
