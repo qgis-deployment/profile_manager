@@ -318,9 +318,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="styles_check">
+             <widget class="QCheckBox" name="style_items_check">
               <property name="text">
-               <string>Styles + Labels</string>
+               <string>Style Items (e.g. symbols, colorramps, text formats, label settings)</string>
               </property>
              </widget>
             </item>
