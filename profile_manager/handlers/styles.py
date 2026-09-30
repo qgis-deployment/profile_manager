@@ -1,50 +1,117 @@
-import sqlite3
 from pathlib import Path
 from shutil import copy
 
+from qgis.core import Qgis, QgsStyle
 
-def import_styles(source_profile_path: Path, target_profile_path: Path):
-    """Imports styles from source profile to target profile.
+from profile_manager.toolbelt.log_handler import PlgLogger
 
-    Note: Currently it only imports symbols (not 3D) and label settings, not 3D symbols, color ramps, tags, etc.
 
-    Styles are stored in symbology-style.db.
+logger = PlgLogger()
+
+# relevant info and functions:
+# - Human-readable name of the entity type (dammit SIP, why is this not easily available...) in plural
+# - QgsStyle method name for getting the names of all existing entities of a specific type
+# - QgsStyle method name for getting a specific entity by name
+# - QgsStyle method name for adding an entity to the style
+ENTITY_ACCESSORS = {
+    QgsStyle.StyleEntity.ColorrampEntity: (
+        "color ramps",
+        "colorRampNames",
+        "colorRamp",
+        "addColorRamp",
+    ),
+    QgsStyle.StyleEntity.LabelSettingsEntity: (
+        "label settings",
+        "labelSettingsNames",
+        "labelSettings",
+        "addLabelSettings",
+    ),
+    QgsStyle.StyleEntity.LegendPatchShapeEntity: (
+        "legend patch shapes",
+        "legendPatchShapeNames",
+        "legendPatchShape",
+        "addLegendPatchShape",
+    ),
+    QgsStyle.StyleEntity.Symbol3DEntity: (
+        "3D symbols",
+        "symbol3DNames",
+        "symbol3D",
+        "addSymbol3D",
+    ),
+    QgsStyle.StyleEntity.SymbolEntity: (
+        "symbols",
+        "symbolNames",
+        "symbol",
+        "addSymbol",
+    ),
+    QgsStyle.StyleEntity.TextFormatEntity: (
+        "text formats",
+        "textFormatNames",
+        "textFormat",
+        "addTextFormat",
+    ),
+}  # as of QGIS 3.16
+
+# QGIS 4.2 added Material Settings:
+if Qgis.QGIS_VERSION_INT >= 42000:
+    ENTITY_ACCESSORS[QgsStyle.StyleEntity.MaterialSettingsEntity] = (
+        (
+            "material settings",
+            "materialSettingsNames",
+            "materialSettings",
+            "addMaterialSettings",
+        ),
+    )
+
+
+def import_style_items(source_profile_path: Path, target_profile_path: Path):
+    """Imports style items from source profile to target profile.
+
+    Transfers color ramps, label settings, legend patch shapes, material
+    settings (QGIS 4.2+), 3D symbols, symbols, text formats.
+    Tags and the "favorite" mark of style items are also transferred.
+    Note: Smart Groups are currently not transferred.
+
+    Note: Existing style items with identical names will be overwritten!
+
+    Style items are stored in symbology-style.db.
 
     Args:
         source_profile_path: Path of profile directory to import from
         target_profile_path: Path of profile directory to import to
     """
+    # Simply using assertions to check return codes of QGIS functions here, because
+    # this code should never run in environments where asserts are optimized away.
+
     source_db_path = source_profile_path / "symbology-style.db"
     target_db_path = target_profile_path / "symbology-style.db"
 
     # try if we can straight up copy the file to the target profile
     if not target_db_path.is_file():
+        logger.log("No existing style database in target, importing whole database.")
         copy(source_db_path, target_db_path)
         return
 
-    # target file exists, so we transfer styles via SQL
-    source_db = sqlite3.connect(source_db_path)
-    target_db = sqlite3.connect(target_db_path)
+    source_style_db = QgsStyle()
+    assert source_style_db.load(str(source_db_path)), source_style_db.errorString()
+    target_style_db = QgsStyle()
+    assert target_style_db.load(str(target_db_path)), target_style_db.errorString()
 
-    source_db_cursor = source_db.cursor()
-    target_db_cursor = target_db.cursor()
+    for entity_type, (type_name, names_fn, get_fn, add_fn) in ENTITY_ACCESSORS.items():
+        names = getattr(source_style_db, names_fn)()
+        logger.log(f"Importing {len(names)} {type_name}")
+        favorite_names = set(source_style_db.symbolsOfFavorite(entity_type))
 
-    # import label settings
-    custom_labels = source_db_cursor.execute("SELECT * FROM labelsettings")
-    target_db_cursor.executemany(
-        "INSERT OR REPLACE INTO labelsettings VALUES (?, ?, ?, ?)", custom_labels
-    )
+        for name in names:
+            # get from source, add to target
+            entry = getattr(source_style_db, get_fn)(name)
+            assert getattr(target_style_db, add_fn)(name, entry, update=True)
 
-    # import symbols
-    # FIXME: This has a hard-coded assumption that symbols with ids <= 115 are builtin symbols,
-    #        this will fail as soon as a new builtin symbol is shipped by QGIS.
-    custom_symbols = source_db_cursor.execute("SELECT * FROM symbol WHERE id > 115")
-    target_db_cursor.executemany(
-        "INSERT OR REPLACE INTO symbol VALUES (?, ?, ?, ?)", custom_symbols
-    )
+            # handle tags and favorite mark, if exist
+            tags = source_style_db.tagsOfSymbol(entity_type, name)
+            if tags:
+                assert target_style_db.tagSymbol(entity_type, name, tags)
+            if name in favorite_names:
+                assert target_style_db.addFavorite(entity_type, name)
 
-    source_db.commit()
-    target_db.commit()
-
-    source_db.close()
-    target_db.close()
+    # we do not need to save the target file
