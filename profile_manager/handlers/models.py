@@ -29,6 +29,7 @@ def import_models(source_profile_path: Path, target_profile_path: Path):
     target_models_dir = target_profile_path / "processing" / "models"
 
     if not source_models_dir.exists():
+        logger.log("No model files found in source profile")
         return
 
     if not target_models_dir.exists():
