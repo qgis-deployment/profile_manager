@@ -19,13 +19,14 @@ Profile Manager allows partial configuration transfers without copying an entire
 
 ## Transferable items
 
-Depending on the QGIS and plugin versions, you may transfer:
+You can transfer:
 
-* Database connections
-* Web service connections (WMS, WFS, etc.)
-* Installed plugins
-* Styles and symbols
-* Bookmarks
+* Data source connections
+* Expressions
+* Favourites
+* Plugins
 * Processing models and scripts
-* User variables
-* Custom Python functions
+* Python expression functions
+* Spatial bookmarks
+* Style items (color ramps, label settings, legend patch shapes, material settings (QGIS 4.2+), 3D symbols, symbols, text formats)
+* UI customization settings
