@@ -13,7 +13,7 @@ logger = PlgLogger()
 
 
 def collect_plugin_names(profile_path: Path) -> list[str]:
-    """Collect installed plugins for the profile directory."""
+    """Returns the directory names of installed plugins in the profile directory."""
     logger.log(f"Collecting plugin names from  {profile_path}")
     plugins_directory = profile_path / "python" / "plugins"
     installed_plugins = [p for p, _ in findPlugins(str(plugins_directory))]
@@ -53,7 +53,7 @@ def import_plugins(
         source_profile_path: Path of profile directory to import from
         target_profile_path: Path of profile directory to import to
         target_qgis_ini_file: Path of target QGIS3.ini file to import to
-        plugin_names: List of plugins (names according to QGIS3.ini) to import
+        plugin_names: List of plugins (=their directory names) to import
     """
     logger.log(f"Importing {len(plugin_names)} data sources to {target_profile_path}")
     start_time = datetime.now()
@@ -100,7 +100,7 @@ def remove_plugins(
     Args:
         profile_path: Path of profile directory to remove from
         qgis_ini_file: Path of target QGIS3.ini file to remove from
-        plugin_names: List of plugins (names according to QGIS3.ini) to remove
+        plugin_names: List of plugins (=their directory names) to remove
     """
     logger.log(f"Removing {len(plugin_names)} plugins from {profile_path}")
     start_time = datetime.now()
