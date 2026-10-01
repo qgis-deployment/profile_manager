@@ -34,7 +34,7 @@ from profile_manager.handlers.plugins import (
 )
 from profile_manager.handlers.python_expressions import import_python_expressions
 from profile_manager.handlers.scripts import import_scripts
-from profile_manager.handlers.styles import import_style_items
+from profile_manager.handlers.style_items import import_style_items
 from profile_manager.profile_manager_dialog import ProfileManagerDialog
 from profile_manager.profiles.profile_handler import (
     copy_profile,
