@@ -38,7 +38,7 @@ def import_bookmarks(source_bookmark_file: Path, target_bookmark_file: Path):
     target_bmm = QgsBookmarkManager()
     target_bmm.initialize(str(target_bookmark_file))
 
-    source_bookmarks = source_bmm.getBookmarks()
+    source_bookmarks = source_bmm.bookmarks()
     if not source_bookmarks:
         logger.log("No bookmarks found in source profile")
         return
