@@ -172,7 +172,7 @@ class ProfileManager:
         self.source_profile_path = qgis_profiles_path() / profile_name
         self.source_qgis_ini_file = get_profile_qgis_ini_path(profile_name)
         self.source_data_sources = collect_data_sources(self.source_qgis_ini_file)
-        self.source_plugins = collect_plugin_names(self.source_qgis_ini_file)
+        self.source_plugins = collect_plugin_names(self.source_profile_path)
 
     def change_target_profile(self, profile_name: str):
         # TODO handle profile_name=None without any attempts of data collecting
@@ -180,7 +180,7 @@ class ProfileManager:
         self.target_profile_path = qgis_profiles_path() / profile_name
         self.target_qgis_ini_file = get_profile_qgis_ini_path(profile_name)
         self.target_data_sources = collect_data_sources(self.target_qgis_ini_file)
-        self.target_plugins = collect_plugin_names(self.target_qgis_ini_file)
+        self.target_plugins = collect_plugin_names(self.target_profile_path)
 
     def make_backup(self, profile_name: str) -> Optional[str]:
         """Creates a backup of the specified profile.
@@ -288,7 +288,7 @@ class ProfileManager:
                 error_messages.append(
                     self.tr("Error while importing plugins: {}").format(e)
                 )
-            self.target_plugins = collect_plugin_names(self.target_qgis_ini_file)
+            self.target_plugins = collect_plugin_names(self.target_profile_path)
 
         if do_import_bookmarks:
             self.log(self.tr("Importing bookmarks..."))
@@ -407,7 +407,7 @@ class ProfileManager:
                 error_messages.append(
                     self.tr("Error while removing plugins: {}").format(e)
                 )
-            self.source_plugins = collect_plugin_names(self.source_qgis_ini_file)
+            self.source_plugins = collect_plugin_names(self.source_profile_path)
 
         self.__refresh_qgis_browser_panels()
 

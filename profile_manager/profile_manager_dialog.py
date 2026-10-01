@@ -662,10 +662,6 @@ class ProfileManagerDialog(QtWidgets.QDialog):
         for item in self.list_plugins.findItems(
             "", Qt.MatchFlag.MatchContains | Qt.MatchFlag.MatchRecursive
         ):
-            if (
-                item.data(Qt.ItemDataRole.UserRole) is False
-            ):  # Core Plugins are marked with this
-                continue
             if item.checkState() == Qt.CheckState.Checked:
                 plugin_names.append(item.text())
         return plugin_names

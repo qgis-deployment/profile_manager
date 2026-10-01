@@ -1,8 +1,6 @@
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QListWidgetItem, QTreeWidgetItem
 
-from profile_manager.handlers.plugins import CORE_PLUGINS
-
 
 def data_sources_as_tree(
     provider: str, data_sources: dict, make_checkable: bool
@@ -43,10 +41,7 @@ def data_sources_as_tree(
 
 
 def plugins_as_items(plugins: list[str], make_checkable: bool) -> list[QListWidgetItem]:
-    """Return the plugins as list of QListWidgetItem.
-
-    Core Plugins are specially marked.
-    """
+    """Return the plugins as list of QListWidgetItem."""
     items = []
     for plugin_name in plugins:
         item = QListWidgetItem()
@@ -57,10 +52,6 @@ def plugins_as_items(plugins: list[str], make_checkable: bool) -> list[QListWidg
         else:
             item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsSelectable)
 
-        if plugin_name in CORE_PLUGINS:
-            item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEnabled)
-            item.setData(Qt.ItemDataRole.UserRole, False)  # to safely ignore them later
-            plugin_name = f"{plugin_name} (Core Plugin)"
         item.setText(plugin_name)
 
         items.append(item)
