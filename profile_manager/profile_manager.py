@@ -9,7 +9,7 @@ from shutil import copytree
 from typing import Optional
 
 # PyQGIS
-from qgis.core import Qgis, QgsMessageLog, QgsSettings, QgsUserProfileManager
+from qgis.core import Qgis, QgsSettings, QgsUserProfileManager
 from qgis.gui import QgisInterface
 from qgis.PyQt.QtCore import QCoreApplication, QLocale, QTranslator
 from qgis.PyQt.QtGui import QIcon
@@ -32,8 +32,9 @@ from profile_manager.handlers.plugins import (
     import_plugins,
     remove_plugins,
 )
+from profile_manager.handlers.python_expressions import import_python_expressions
 from profile_manager.handlers.scripts import import_scripts
-from profile_manager.handlers.styles import import_styles
+from profile_manager.handlers.style_items import import_style_items
 from profile_manager.profile_manager_dialog import ProfileManagerDialog
 from profile_manager.profiles.profile_handler import (
     copy_profile,
@@ -171,7 +172,7 @@ class ProfileManager:
         self.source_profile_path = qgis_profiles_path() / profile_name
         self.source_qgis_ini_file = get_profile_qgis_ini_path(profile_name)
         self.source_data_sources = collect_data_sources(self.source_qgis_ini_file)
-        self.source_plugins = collect_plugin_names(self.source_qgis_ini_file)
+        self.source_plugins = collect_plugin_names(self.source_profile_path)
 
     def change_target_profile(self, profile_name: str):
         # TODO handle profile_name=None without any attempts of data collecting
@@ -179,7 +180,7 @@ class ProfileManager:
         self.target_profile_path = qgis_profiles_path() / profile_name
         self.target_qgis_ini_file = get_profile_qgis_ini_path(profile_name)
         self.target_data_sources = collect_data_sources(self.target_qgis_ini_file)
-        self.target_plugins = collect_plugin_names(self.target_qgis_ini_file)
+        self.target_plugins = collect_plugin_names(self.target_profile_path)
 
     def make_backup(self, profile_name: str) -> Optional[str]:
         """Creates a backup of the specified profile.
@@ -193,11 +194,7 @@ class ProfileManager:
         ts = int(time.time())
         target_path = self.backup_path / str(ts)
         source_path = qgis_profiles_path() / profile_name
-        QgsMessageLog.logMessage(
-            f"Backing up profile {profile_name!r} to {target_path!r}",
-            __title__,
-            level=Qgis.MessageLevel.Info,
-        )
+        self.log(f"Backing up profile {profile_name!r} to {target_path!r}")
         try:
             copytree(source_path, target_path)
         except Exception as e:
@@ -247,8 +244,9 @@ class ProfileManager:
         do_import_favourites: bool,
         do_import_models: bool,
         do_import_scripts: bool,
-        do_import_styles: bool,
+        do_import_style_items: bool,
         do_import_expressions: bool,
+        do_import_python_expressions: bool,
         do_import_customizations: bool,
     ) -> list[str]:
         """Handles import of all things supported."""
@@ -260,12 +258,10 @@ class ProfileManager:
 
         error_messages = []
         if data_sources:
-            QgsMessageLog.logMessage(
+            self.log(
                 self.tr("Importing {} data sources...").format(
                     sum([len(v) for v in data_sources.values()])
-                ),
-                __title__,
-                level=Qgis.MessageLevel.Info,
+                )
             )
             try:
                 import_data_sources(
@@ -280,11 +276,7 @@ class ProfileManager:
             self.target_data_sources = collect_data_sources(self.target_qgis_ini_file)
 
         if plugins:
-            QgsMessageLog.logMessage(
-                self.tr("Importing {} plugins...").format(len(plugins)),
-                __title__,
-                level=Qgis.MessageLevel.Info,
-            )
+            self.log(self.tr("Importing {} plugins...").format(len(plugins)))
             try:
                 import_plugins(
                     self.source_profile_path,
@@ -296,14 +288,10 @@ class ProfileManager:
                 error_messages.append(
                     self.tr("Error while importing plugins: {}").format(e)
                 )
-            self.target_plugins = collect_plugin_names(self.target_qgis_ini_file)
+            self.target_plugins = collect_plugin_names(self.target_profile_path)
 
         if do_import_bookmarks:
-            QgsMessageLog.logMessage(
-                self.tr("Importing bookmarks..."),
-                __title__,
-                level=Qgis.MessageLevel.Info,
-            )
+            self.log(self.tr("Importing bookmarks..."))
             try:
                 import_bookmarks(
                     self.source_profile_path / "bookmarks.xml",
@@ -315,11 +303,7 @@ class ProfileManager:
                 )
 
         if do_import_favourites:
-            QgsMessageLog.logMessage(
-                self.tr("Importing favourites..."),
-                __title__,
-                level=Qgis.MessageLevel.Info,
-            )
+            self.log(self.tr("Importing favourites..."))
             try:
                 import_favourites(self.source_qgis_ini_file, self.target_qgis_ini_file)
             except Exception as e:
@@ -328,11 +312,7 @@ class ProfileManager:
                 )
 
         if do_import_models:
-            QgsMessageLog.logMessage(
-                self.tr("Importing models..."),
-                __title__,
-                level=Qgis.MessageLevel.Info,
-            )
+            self.log(self.tr("Importing models..."))
             try:
                 import_models(self.source_profile_path, self.target_profile_path)
             except Exception as e:
@@ -341,11 +321,7 @@ class ProfileManager:
                 )
 
         if do_import_scripts:
-            QgsMessageLog.logMessage(
-                self.tr("Importing scripts..."),
-                __title__,
-                level=Qgis.MessageLevel.Info,
-            )
+            self.log(self.tr("Importing scripts..."))
             try:
                 import_scripts(self.source_profile_path, self.target_profile_path)
             except Exception as e:
@@ -353,25 +329,17 @@ class ProfileManager:
                     self.tr("Error while importing scripts: {}").format(e)
                 )
 
-        if do_import_styles:
-            QgsMessageLog.logMessage(
-                self.tr("Importing styles..."),
-                __title__,
-                level=Qgis.MessageLevel.Info,
-            )
+        if do_import_style_items:
+            self.log(self.tr("Importing style items..."))
             try:
-                import_styles(self.source_profile_path, self.target_profile_path)
+                import_style_items(self.source_profile_path, self.target_profile_path)
             except Exception as e:
                 error_messages.append(
-                    self.tr("Error while importing styles: {}").format(e)
+                    self.tr("Error while importing style items: {}").format(e)
                 )
 
         if do_import_expressions:
-            QgsMessageLog.logMessage(
-                self.tr("Importing expressions..."),
-                __title__,
-                level=Qgis.MessageLevel.Info,
-            )
+            self.log(self.tr("Importing expressions..."))
             try:
                 import_expressions(self.source_qgis_ini_file, self.target_qgis_ini_file)
             except Exception as e:
@@ -379,12 +347,19 @@ class ProfileManager:
                     self.tr("Error while importing expressions: {}").format(e)
                 )
 
+        if do_import_python_expressions:
+            self.log(self.tr("Importing Python expressions..."))
+            try:
+                import_python_expressions(
+                    self.source_profile_path, self.target_profile_path
+                )
+            except Exception as e:
+                error_messages.append(
+                    self.tr("Error while importing Python expressions: {}").format(e)
+                )
+
         if do_import_customizations:
-            QgsMessageLog.logMessage(
-                self.tr("Importing customizations..."),
-                __title__,
-                level=Qgis.MessageLevel.Info,
-            )
+            self.log(self.tr("Importing customizations..."))
             try:
                 import_customizations(
                     self.source_profile_path, self.target_profile_path
@@ -403,12 +378,10 @@ class ProfileManager:
         error_messages = []
 
         if data_sources:
-            QgsMessageLog.logMessage(
+            self.log(
                 self.tr("Removing {} data sources...").format(
                     sum([len(v) for v in data_sources.values()])
-                ),
-                __title__,
-                level=Qgis.MessageLevel.Info,
+                )
             )
             try:
                 remove_data_sources(
@@ -423,11 +396,7 @@ class ProfileManager:
             self.source_data_sources = collect_data_sources(self.source_qgis_ini_file)
 
         if plugins:
-            QgsMessageLog.logMessage(
-                self.tr("Removing {} plugins...").format(len(plugins)),
-                __title__,
-                level=Qgis.MessageLevel.Info,
-            )
+            self.log(self.tr("Removing {} plugins...").format(len(plugins)))
             try:
                 remove_plugins(
                     self.source_profile_path,
@@ -438,7 +407,7 @@ class ProfileManager:
                 error_messages.append(
                     self.tr("Error while removing plugins: {}").format(e)
                 )
-            self.source_plugins = collect_plugin_names(self.source_qgis_ini_file)
+            self.source_plugins = collect_plugin_names(self.source_profile_path)
 
         self.__refresh_qgis_browser_panels()
 

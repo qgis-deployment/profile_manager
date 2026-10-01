@@ -1,23 +1,23 @@
-from configparser import RawConfigParser
 from pathlib import Path
 from shutil import copy2
+
+from qgis.PyQt.QtCore import QSettings
+
+from profile_manager.toolbelt.log_handler import PlgLogger
+
+
+logger = PlgLogger()
 
 
 def import_customizations(source_profile_path: Path, target_profile_path: Path):
     r"""Imports UI customizations from source to target profile.
 
-    Copies the whole QGISCUSTOMIZATION3.ini file and also transfers the [UI] section from QGIS3.ini if available
+    Copies the whole QGISCUSTOMIZATION3.ini file and enables customization in QGIS3.ini.
 
-    TODO fix discrepancy between [UI] and [Customization]! Which one(s) exist and what do we want to transfer?
+    Note: Existing customization will be overwritten!
 
-    E.g.:
-
-    .. code-block:: ini
-
-       [Customization]
-       Browser=true
-       Browser\AFS=false
-       ...
+    Customizations are stored in QGISCUSTOMIZATION3.ini and enabled in QGIS3.ini
+    under [UI]Customization\enabled=true
 
     Args:
         source_profile_path: Path of profile directory to import from
@@ -27,29 +27,25 @@ def import_customizations(source_profile_path: Path, target_profile_path: Path):
     source_customini_path = source_profile_path / "QGIS" / "QGISCUSTOMIZATION3.ini"
     target_customini_path = target_profile_path / "QGIS" / "QGISCUSTOMIZATION3.ini"
     if source_customini_path.exists():
+        logger.log("Copying QGISCUSTOMIZATION3.ini to target profile")
         copy2(source_customini_path, target_customini_path)
+    else:
+        logger.log("No QGISCUSTOMIZATION3.ini found in source profile")
+        return
 
-    # Copy [UI] section from QGIS3.ini
-    source_qgis3ini_path = source_profile_path / "QGIS" / "QGIS3.ini"
-    target_qgis3ini_path = target_profile_path / "QGIS" / "QGIS3.ini"
+    # Toggle UI customization depending on the setting in the source profile
+    source_settings = QSettings(
+        str(source_profile_path / "QGIS" / "QGIS3.ini"), QSettings.Format.IniFormat
+    )
+    target_settings = QSettings(
+        str(target_profile_path / "QGIS" / "QGIS3.ini"), QSettings.Format.IniFormat
+    )
+    customization_setting = source_settings.value("UI/Customization/enabled", type=bool)
+    if customization_setting is True:
+        target_settings.setValue("UI/Customization/enabled", True)
+        logger.log("Enabling UI customization in target profile")
+    elif customization_setting is False:
+        target_settings.setValue("UI/Customization/enabled", False)
+        logger.log("Disabling UI customization in target profile")
 
-    source_ini_parser = RawConfigParser()
-    source_ini_parser.optionxform = str  # str = case-sensitive option names
-    source_ini_parser.read(source_qgis3ini_path)
-
-    # TODO this is broken, right? It looks for [UI] but even in QGIS 3.10 (didnt check older) the (single) section is named [Customization]
-    if source_ini_parser.has_section("UI"):
-        ui_data = dict(source_ini_parser.items("UI"))
-
-        target_ini_parser = RawConfigParser()
-        target_ini_parser.optionxform = str  # str = case-sensitive option names
-        target_ini_parser.read(target_qgis3ini_path)
-
-        for setting in ui_data:
-            if not target_ini_parser.has_section("UI"):
-                target_ini_parser["UI"] = {}
-
-            target_ini_parser.set("UI", setting, ui_data[setting])
-
-        with open(target_qgis3ini_path, "w") as qgisconf:
-            target_ini_parser.write(qgisconf, space_around_delimiters=False)
+    # writing the target file is handled by QSettings’s destructor
