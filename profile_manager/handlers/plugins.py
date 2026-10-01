@@ -102,7 +102,7 @@ def remove_plugins(
         qgis_ini_file: Path of target QGIS3.ini file to remove from
         plugin_names: List of plugins (names according to QGIS3.ini) to remove
     """
-    logger.log(f"Removing {len(plugin_names)} data sources from {profile_path}")
+    logger.log(f"Removing {len(plugin_names)} plugins from {profile_path}")
     start_time = datetime.now()
 
     settings = QSettings(str(qgis_ini_file), QSettings.Format.IniFormat)
