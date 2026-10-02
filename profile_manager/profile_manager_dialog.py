@@ -3,7 +3,7 @@ from functools import partial
 from pathlib import Path
 from typing import Literal, Optional
 
-from qgis.core import QgsApplication
+from qgis.core import QgsApplication, QgsSettings
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import QSize, Qt, QUrl
 from qgis.PyQt.QtGui import QDesktopServices, QIcon
@@ -592,29 +592,42 @@ class ProfileManagerDialog(QtWidgets.QDialog):
         """Removes the selected profile (after creating a backup)."""
         profile_name = self.get_list_selection_profile_name()
 
+        backup_directory = QgsSettings().value(
+            "/plugins/profile_manager/backup_directory", None
+        )
+        if backup_directory:
+            backup_text = self.tr("A backup will be created in '{}'").format(
+                backup_directory
+            )
+        else:
+            backup_text = self.tr(
+                "No backup will be created. You can enable automatic backups in the QGIS options menu."
+            )
+        confirmation_text = self.tr(
+            "Are you sure you want to remove the profile '{0}'?"
+        ).format(profile_name)
+        dialog_text = f"{confirmation_text}\n\n{backup_text}"
+
         do_remove_profile = QMessageBox.question(
-            self,
-            self.tr("Remove Profile"),
-            self.tr(
-                "Are you sure you want to remove the profile '{0}'?\n\nA backup will be created at '{1}".format(
-                    profile_name, self.__profile_manager.backup_path
-                )
-            ),
+            self, self.tr("Remove Profile"), dialog_text
         )
         if do_remove_profile == QMessageBox.StandardButton.No:
             return
 
-        with wait_cursor():
-            error_message = self.__profile_manager.make_backup(profile_name)
-        if error_message:
-            QMessageBox.critical(
-                self,
-                self.tr("Backup could not be created"),
-                self.tr("Aborting removal of profile '{0}' due to error:\n{1}").format(
-                    profile_name, error_message
-                ),
-            )
-            return
+        if backup_directory:
+            with wait_cursor():
+                error_message = self.__profile_manager.make_backup(
+                    profile_name, backup_directory
+                )
+            if error_message:
+                QMessageBox.critical(
+                    self,
+                    self.tr("Backup could not be created"),
+                    self.tr(
+                        "Aborting removal of profile '{0}' due to error:\n{1}"
+                    ).format(profile_name, error_message),
+                )
+                return
 
         with wait_cursor():
             error_message = self.__profile_manager.remove_profile(profile_name)
@@ -673,17 +686,21 @@ class ProfileManagerDialog(QtWidgets.QDialog):
         Aborts and shows an error message if no backup could be made.
         """
 
-        with wait_cursor():
-            error_message = self.__profile_manager.make_backup(
-                self.__profile_manager.target_profile_name
-            )
-        if error_message:
-            QMessageBox.critical(
-                self,
-                self.tr("Backup could not be created"),
-                self.tr("Aborting import due to error:\n{}").format(error_message),
-            )
-            return
+        backup_directory = QgsSettings().value(
+            "/plugins/profile_manager/backup_directory", None
+        )
+        if backup_directory:
+            with wait_cursor():
+                error_message = self.__profile_manager.make_backup(
+                    self.__profile_manager.target_profile_name, backup_directory
+                )
+            if error_message:
+                QMessageBox.critical(
+                    self,
+                    self.tr("Backup could not be created"),
+                    self.tr("Aborting import due to error:\n{}").format(error_message),
+                )
+                return
 
         with wait_cursor():
             selected_data_sources = self.__selected_data_sources()
@@ -727,33 +744,40 @@ class ProfileManagerDialog(QtWidgets.QDialog):
 
         Aborts and shows an error message if no backup could be made.
         """
-
-        do_remove_things = QMessageBox.question(
-            self,
-            self.tr("Removal"),
-            self.tr(
-                (
-                    "Are you sure you want to remove the selected data sources and plugins?"
-                    "\n\nA backup will be created at {}"
-                )
-            ).format(self.__profile_manager.backup_path),
+        backup_directory = QgsSettings().value(
+            "/plugins/profile_manager/backup_directory", None
         )
+        if backup_directory:
+            backup_text = self.tr("A backup will be created in '{}'").format(
+                backup_directory
+            )
+        else:
+            backup_text = self.tr(
+                "No backup will be created. You can enable automatic backups in the QGIS options menu."
+            )
+        confirmation_text = self.tr(
+            "Are you sure you want to remove the selected data sources and plugins?"
+        )
+        dialog_text = f"{confirmation_text}\n\n{backup_text}"
+
+        do_remove_things = QMessageBox.question(self, self.tr("Removal"), dialog_text)
         if do_remove_things == QMessageBox.StandardButton.No:
             return
 
-        with wait_cursor():
-            error_message = self.__profile_manager.make_backup(
-                self.__profile_manager.source_profile_name
-            )
-        if error_message:
-            QMessageBox.critical(
-                self,
-                self.tr("Backup could not be created"),
-                self.tr(
-                    "Aborting removal of selected data sources and plugins due to error:\n{}"
-                ).format(error_message),
-            )
-            return
+        if backup_directory:
+            with wait_cursor():
+                error_message = self.__profile_manager.make_backup(
+                    self.__profile_manager.source_profile_name, backup_directory
+                )
+            if error_message:
+                QMessageBox.critical(
+                    self,
+                    self.tr("Backup could not be created"),
+                    self.tr(
+                        "Aborting removal of selected data sources and plugins due to error:\n{}"
+                    ).format(error_message),
+                )
+                return
 
         with wait_cursor():
             selected_data_sources = self.__selected_data_sources()

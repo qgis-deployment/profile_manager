@@ -34,6 +34,7 @@ from profile_manager.handlers.plugins import (
 )
 from profile_manager.handlers.scripts import import_scripts
 from profile_manager.handlers.styles import import_styles
+from profile_manager.options_page import ProfileManagerOptionsFactory
 from profile_manager.profile_manager_dialog import ProfileManagerDialog
 from profile_manager.profiles.profile_handler import (
     copy_profile,
@@ -61,7 +62,6 @@ class ProfileManager:
         self.log = PlgLogger().log
 
         # attributes
-        self.backup_path = Path.home() / "QGIS Profile Manager Backup"
         self.qgs_profile_manager: Optional[QgsUserProfileManager] = None
         self.__dlg: Optional[ProfileManagerDialog] = None
 
@@ -95,6 +95,7 @@ class ProfileManager:
         # Declare instance attributes
         self.action: Optional[QAction] = None
         self.menu = __title__
+        self.options_factory: Optional[ProfileManagerOptionsFactory] = None
 
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
@@ -126,6 +127,10 @@ class ProfileManager:
         self.iface.addPluginToMenu(self.menu, action)
         self.action = action
 
+        self.options_factory = ProfileManagerOptionsFactory()
+        self.options_factory.setTitle("Profile Manager")
+        self.iface.registerOptionsWidgetFactory(self.options_factory)
+
         # will be set False in run()
         self.first_start = True
 
@@ -133,6 +138,7 @@ class ProfileManager:
         """Removes the plugin menu item and icon from QGIS GUI."""
         self.iface.removePluginMenu(self.menu, self.action)
         self.iface.removeToolBarIcon(self.action)
+        self.iface.unregisterOptionsWidgetFactory(self.options_factory)
 
     def run(self):
         """Run method that performs all the real work"""
@@ -181,17 +187,27 @@ class ProfileManager:
         self.target_data_sources = collect_data_sources(self.target_qgis_ini_file)
         self.target_plugins = collect_plugin_names(self.target_qgis_ini_file)
 
-    def make_backup(self, profile_name: str) -> Optional[str]:
+    def make_backup(self, profile_name: str, backup_directory: str) -> Optional[str]:
         """Creates a backup of the specified profile.
 
         Args:
             profile_name (str): Name of the profile to back up
+            backup_directory (str): Directory where backup should be stored, must already exist
 
         Returns:
-            str: A message if an error occured.
+            str: A message if an error occurred.
         """
+        backup_directory = Path(backup_directory)
+        if not backup_directory.exists():
+            self.log(f"Backup directory {backup_directory!r} does not exist (yet)")
+            try:
+                self.log(f"Creating backup directory {backup_directory!r}")
+                backup_directory.mkdir(parents=True)
+            except OSError as e:
+                return self.tr("Error while creating backup directory: {}").format(e)
+
         ts = int(time.time())
-        target_path = self.backup_path / str(ts)
+        target_path = backup_directory / f"{profile_name}_{str(ts)}"
         source_path = qgis_profiles_path() / profile_name
         QgsMessageLog.logMessage(
             f"Backing up profile {profile_name!r} to {target_path!r}",
