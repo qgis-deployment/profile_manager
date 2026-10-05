@@ -1,6 +1,7 @@
 FORMS =	../../profile_manager_dialog_base.ui
 
-SOURCES =	../../gui/mdl_profiles.py \
+SOURCES =	../../constants.py \
+	../../gui/mdl_profiles.py \
 	../../gui/name_profile_dialog.py \
 	../../gui/utils.py \
 	../../handlers/bookmarks.py \
@@ -10,8 +11,9 @@ SOURCES =	../../gui/mdl_profiles.py \
 	../../handlers/favourites.py \
 	../../handlers/models.py \
 	../../handlers/plugins.py \
+	../../handlers/python_expressions.py \
 	../../handlers/scripts.py \
-	../../handlers/styles.py \
+	../../handlers/style_items.py \
 	../../profile_manager.py \
 	../../profile_manager_dialog.py \
 	../../profiles/profile_handler.py \
