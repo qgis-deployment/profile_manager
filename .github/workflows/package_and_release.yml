@@ -28,6 +28,8 @@ jobs:
   translation:
     name: "💬 i18n compilation"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Get source code
@@ -63,6 +65,8 @@ jobs:
   packaging:
     name: "📦 Packaging plugin"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs:
       - translation
 
@@ -125,6 +129,8 @@ jobs:
   release:
     name: "🚀 Release on tag"
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     needs:
       - translation
 
