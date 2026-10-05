@@ -30,3 +30,5 @@ Everything is done through the continuous deployment:
 1. Change the version number in `metadata.txt`
 1. Apply a git tag with the relevant version: `git tag -a 0.3.0 {git commit hash} -m "This version rocks!"`
 1. Push tag to main branch: `git push origin 0.3.0`
+
+The release job publishes to <https://plugins.qgis.org> with a plugin upload token stored in the `QGIS_PLUGIN_TOKEN` repository secret, not with a personal OSGeo account. To create or rotate it, generate a new token at <https://plugins.qgis.org/plugins/profile_manager/tokens/create/> (plugin maintainers only) and update the secret.

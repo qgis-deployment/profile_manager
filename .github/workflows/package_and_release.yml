@@ -15,7 +15,7 @@ on:
     branches:
       - main
     paths:
-      - .github/workflows/packager.yml
+      - .github/workflows/package_and_release.yml
       - requirements/packaging.txt
       - profile_manager/**/*
 
@@ -171,11 +171,13 @@ jobs:
           generate_release_notes: true
 
       - name: Deploy plugin
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          QGIS_PLUGIN_TOKEN: ${{ secrets.QGIS_PLUGIN_TOKEN }}
         run: >-
           qgis-plugin-ci
           release ${GITHUB_REF/refs\/tags\//}
           --allow-uncommitted-changes
           --create-plugin-repo
-          --github-token ${{ secrets.GITHUB_TOKEN }}
-          --osgeo-username ${{ secrets.OSGEO_USER }}
-          --osgeo-password ${{ secrets.OSGEO_PASSWORD }}
+          --github-token "$GITHUB_TOKEN"
+          --qgis-token "$QGIS_PLUGIN_TOKEN"
