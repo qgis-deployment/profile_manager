@@ -28,6 +28,7 @@ Unreleased
 * Improve Sphinx docs by @kannes in <https://github.com/qgis-deployment/profile_manager/pull/138>
 * remove(packaging): supportsQt6 flag is not a supported flag anymore in metadata.txt by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/111>
 * improve(ci): use token instead of personal credentials to release by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/147>
+* improve(ci): set GH token permissions by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/148>
 
 ## 0.7.4 - 2026-01-20
 
