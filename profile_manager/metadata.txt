@@ -22,5 +22,5 @@ qgisMaximumVersion=4.99.99
 server=False
 
 # versioning - automatically updated by qgis-plugin-ci during packaging and release process
-version=0.8.0-DEV
+version=0.9.0-DEV
 changelog=
