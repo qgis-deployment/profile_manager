@@ -29,11 +29,12 @@ Published on the official QGIS plugins repository: <https://plugins.qgis.org/plu
 - Removing data source connections from a profile
 - Importing (spatial) bookmarks
 - Importing (data source) favourites
-- Importing plugins
+- Importing and removing plugins
 - Importing expressions
+- Importing Python expression functions
 - Importing models
 - Importing scripts
-- Importing some symbology types & label settings
+- Importing style items (color ramps, label settings, legend patch shapes, material settings (QGIS 4.2+), 3D symbols, symbols, text formats)
 - Importing QGIS UI settings (e.g. hidden toolbar items)
 - Exporting a profile in QGIS Deployment Toolkit (QDT) format
 
@@ -44,8 +45,6 @@ Additionally, before every import or deletion, a backup of the affected profile 
 
 - Not all data source connections might be recognized and imported/removed
 - Not all data source connection types are supported
-- Python expression functions are not supported
-- Not all style things are supported, e.g. not 3D symbols, color ramps, tags, etc.
 - Errors might not always be communicated clearly so please TEST your migrated configurations before discarding originals!
 - Creating a new profile does not lead to the same result as creating a new profile in the QGIS GUI, e.g. the QGIS3.ini is not populated with defaults.
 
