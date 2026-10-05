@@ -16,6 +16,19 @@ Unreleased
 
 -->
 
+## 0.8.0 - 2026-10-05
+
+> 🤝 First release under the new QGIS Deployment organization
+
+* fix: Don't swallow error messages of main import function by @kannes in <https://github.com/qgis-deployment/profile_manager/pull/141>
+* chore: bump min QGIS version to 3.40.4 and Python to 3.11 by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/125>
+* QDT export: support plugins from unofficial repository by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/75>
+* Improve handlers by @kannes in <https://github.com/qgis-deployment/profile_manager/pull/142>
+* Update GitHub references to qgis_deployment organisation by @kannes in <https://github.com/qgis-deployment/profile_manager/pull/128>
+* Improve Sphinx docs by @kannes in <https://github.com/qgis-deployment/profile_manager/pull/138>
+* remove(packaging): supportsQt6 flag is not a supported flag anymore in metadata.txt by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/111>
+* improve(ci): use token instead of personal credentials to release by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/147>
+
 ## 0.7.4 - 2026-01-20
 
 > ♥️ Funded by Oslandia
