@@ -55,16 +55,32 @@ ENTITY_ACCESSORS = {
 # QGIS 4.2 added Material Settings:
 if Qgis.QGIS_VERSION_INT >= 42000:
     ENTITY_ACCESSORS[QgsStyle.StyleEntity.MaterialSettingsEntity] = (
-        (
-            "material settings",
-            "materialSettingsNames",
-            "materialSettings",
-            "addMaterialSettings",
-        ),
+        "material settings",
+        "materialSettingsNames",
+        "materialSettings",
+        "addMaterialSettings",
     )
 
 
-def import_style_items(source_profile_path: Path, target_profile_path: Path):
+def _load_style_db(db_path: Path) -> QgsStyle:
+    """Load a QGIS style database.
+
+    :param db_path: path to the `symbology-style.db` file
+    :type db_path: Path
+
+    :raises RuntimeError: if the database cannot be loaded
+    :return: loaded style database
+    :rtype: QgsStyle
+    """
+    style_db = QgsStyle()
+    if not style_db.load(str(db_path)):
+        raise RuntimeError(
+            f"Failed to load style database {db_path}: {style_db.errorString()}"
+        )
+    return style_db
+
+
+def import_style_items(source_profile_path: Path, target_profile_path: Path) -> None:
     """Imports style items from source profile to target profile.
 
     Transfers color ramps, label settings, legend patch shapes, material
@@ -76,13 +92,14 @@ def import_style_items(source_profile_path: Path, target_profile_path: Path):
 
     Style items are stored in symbology-style.db.
 
-    Args:
-        source_profile_path: Path of profile directory to import from
-        target_profile_path: Path of profile directory to import to
-    """
-    # Simply using assertions to check return codes of QGIS functions here, because
-    # this code should never run in environments where asserts are optimized away.
+    :param source_profile_path: path of profile directory to import from
+    :type source_profile_path: Path
+    :param target_profile_path: path of profile directory to import to
+    :type target_profile_path: Path
 
+    :raises RuntimeError: if a database cannot be loaded or an item, its tags or
+        its favorite mark cannot be written to the target
+    """
     source_db_path = source_profile_path / "symbology-style.db"
     target_db_path = target_profile_path / "symbology-style.db"
 
@@ -92,10 +109,8 @@ def import_style_items(source_profile_path: Path, target_profile_path: Path):
         copy(source_db_path, target_db_path)
         return
 
-    source_style_db = QgsStyle()
-    assert source_style_db.load(str(source_db_path)), source_style_db.errorString()
-    target_style_db = QgsStyle()
-    assert target_style_db.load(str(target_db_path)), target_style_db.errorString()
+    source_style_db = _load_style_db(source_db_path)
+    target_style_db = _load_style_db(target_db_path)
 
     for entity_type, (type_name, names_fn, get_fn, add_fn) in ENTITY_ACCESSORS.items():
         names = getattr(source_style_db, names_fn)()
@@ -105,13 +120,16 @@ def import_style_items(source_profile_path: Path, target_profile_path: Path):
         for name in names:
             # get from source, add to target
             entry = getattr(source_style_db, get_fn)(name)
-            assert getattr(target_style_db, add_fn)(name, entry, update=True)
+            if not getattr(target_style_db, add_fn)(name, entry, update=True):
+                raise RuntimeError(f"Failed to import {type_name}: {name!r}")
 
             # handle tags and favorite mark, if exist
             tags = source_style_db.tagsOfSymbol(entity_type, name)
-            if tags:
-                assert target_style_db.tagSymbol(entity_type, name, tags)
-            if name in favorite_names:
-                assert target_style_db.addFavorite(entity_type, name)
+            if tags and not target_style_db.tagSymbol(entity_type, name, tags):
+                raise RuntimeError(f"Failed to tag {type_name}: {name!r}")
+            if name in favorite_names and not target_style_db.addFavorite(
+                entity_type, name
+            ):
+                raise RuntimeError(f"Failed to mark {type_name} as favorite: {name!r}")
 
     # we do not need to save the target file
