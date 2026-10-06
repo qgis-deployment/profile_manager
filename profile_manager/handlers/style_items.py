@@ -68,10 +68,15 @@ def _load_style_db(db_path: Path) -> QgsStyle:
     :param db_path: path to the `symbology-style.db` file
     :type db_path: Path
 
+    :raises FileNotFoundError: if ``db_path`` does not exist. Checked upfront because
+        :meth:`QgsStyle.load` would otherwise silently create an empty database.
     :raises RuntimeError: if the database cannot be loaded
     :return: loaded style database
     :rtype: QgsStyle
     """
+    if not db_path.is_file():
+        raise FileNotFoundError(f"Style database not found: {db_path}")
+
     style_db = QgsStyle()
     if not style_db.load(str(db_path)):
         raise RuntimeError(
@@ -97,8 +102,10 @@ def import_style_items(source_profile_path: Path, target_profile_path: Path) -> 
     :param target_profile_path: path of profile directory to import to
     :type target_profile_path: Path
 
-    :raises RuntimeError: if a database cannot be loaded or an item, its tags or
-        its favorite mark cannot be written to the target
+    :raises FileNotFoundError: if the source style database does not exist
+    :raises ValueError: if a source item is invalid (null entity or empty name)
+    :raises RuntimeError: if a database cannot be loaded or an item's tags or
+        favorite mark cannot be written to the target
     """
     source_db_path = source_profile_path / "symbology-style.db"
     target_db_path = target_profile_path / "symbology-style.db"
@@ -120,8 +127,10 @@ def import_style_items(source_profile_path: Path, target_profile_path: Path) -> 
         for name in names:
             # get from source, add to target
             entry = getattr(source_style_db, get_fn)(name)
+            # add*() only returns False on null entity or empty name; SQLite write
+            # errors are not reported upstream (see QgsStyle::addSymbol)
             if not getattr(target_style_db, add_fn)(name, entry, update=True):
-                raise RuntimeError(f"Failed to import {type_name}: {name!r}")
+                raise ValueError(f"Invalid {type_name} in source: {name!r}")
 
             # handle tags and favorite mark, if exist
             tags = source_style_db.tagsOfSymbol(entity_type, name)
