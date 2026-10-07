@@ -8,7 +8,7 @@ from profile_manager.toolbelt import PlgLogger
 logger = PlgLogger()
 
 
-def import_bookmarks(source_bookmark_file: Path, target_bookmark_file: Path):
+def import_bookmarks(source_bookmark_file: Path, target_bookmark_file: Path) -> None:
     """Imports spatial bookmarks from source to target file.
 
     Existing bookmarks will be updated/overwritten when IDs match.
@@ -19,9 +19,12 @@ def import_bookmarks(source_bookmark_file: Path, target_bookmark_file: Path):
           to bookmarks in the same session as a Profile Manager import will not be
           reflected in the target file.
 
-    Args:
-        source_bookmark_file: Path of bookmarks file to import from
-        target_bookmark_file: Path of bookmarks file to import to
+    :param source_bookmark_file: path of bookmarks file to import from
+    :type source_bookmark_file: Path
+    :param target_bookmark_file: path of bookmarks file to import to
+    :type target_bookmark_file: Path
+
+    :raises RuntimeError: if a bookmark cannot be added to or updated in the target
     """
     # This function *could* use QgsApplication.bookmarkManager() as source but let's
     # keep it similar to the other functions and have similar source and target
@@ -55,10 +58,11 @@ def import_bookmarks(source_bookmark_file: Path, target_bookmark_file: Path):
         target_bookmark = target_bmm.bookmarkById(bookmark.id())
         if target_bookmark.id() == "":
             # ID does not exist in target, we should copy the bookmark to it
-            bookmark_id, success = target_bmm.addBookmark(bookmark)
-            assert success
-        else:
-            # ID exists in target so updateBookmark() will be able to replace it
-            assert target_bmm.updateBookmark(bookmark)
+            _, success = target_bmm.addBookmark(bookmark)
+            if not success:
+                raise RuntimeError(f"Failed to add bookmark {bookmark.name()!r}")
+        elif not target_bmm.updateBookmark(bookmark):
+            # ID exists in target so updateBookmark() should be able to replace it
+            raise RuntimeError(f"Failed to update bookmark {bookmark.name()!r}")
 
     del target_bmm  # flush the target file
