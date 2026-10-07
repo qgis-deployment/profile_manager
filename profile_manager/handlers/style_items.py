@@ -53,7 +53,7 @@ ENTITY_ACCESSORS = {
 }  # as of QGIS 3.16
 
 # QGIS 4.2 added Material Settings:
-if Qgis.QGIS_VERSION_INT >= 42000:
+if Qgis.QGIS_VERSION_INT >= 40203:
     ENTITY_ACCESSORS[QgsStyle.StyleEntity.MaterialSettingsEntity] = (
         (
             "material settings",
