@@ -3,6 +3,12 @@ from shutil import copy
 
 from qgis.core import Qgis, QgsStyle
 
+from profile_manager.exceptions import (
+    InvalidItemError,
+    ItemImportError,
+    StyleDatabaseError,
+    StyleDatabaseNotFoundError,
+)
 from profile_manager.toolbelt.log_handler import PlgLogger
 
 
@@ -68,18 +74,19 @@ def _load_style_db(db_path: Path) -> QgsStyle:
     :param db_path: path to the `symbology-style.db` file
     :type db_path: Path
 
-    :raises FileNotFoundError: if ``db_path`` does not exist. Checked upfront because
-        :meth:`QgsStyle.load` would otherwise silently create an empty database.
-    :raises RuntimeError: if the database cannot be loaded
+    :raises StyleDatabaseNotFoundError: if ``db_path`` does not exist. Checked
+        upfront because :meth:`QgsStyle.load` would otherwise silently create an
+        empty database.
+    :raises StyleDatabaseError: if the database cannot be loaded
     :return: loaded style database
     :rtype: QgsStyle
     """
     if not db_path.is_file():
-        raise FileNotFoundError(f"Style database not found: {db_path}")
+        raise StyleDatabaseNotFoundError(f"Style database not found: {db_path}")
 
     style_db = QgsStyle()
     if not style_db.load(str(db_path)):
-        raise RuntimeError(
+        raise StyleDatabaseError(
             f"Failed to load style database {db_path}: {style_db.errorString()}"
         )
     return style_db
@@ -102,13 +109,18 @@ def import_style_items(source_profile_path: Path, target_profile_path: Path) -> 
     :param target_profile_path: path of profile directory to import to
     :type target_profile_path: Path
 
-    :raises FileNotFoundError: if the source style database does not exist
-    :raises ValueError: if a source item is invalid (null entity or empty name)
-    :raises RuntimeError: if a database cannot be loaded or an item's tags or
-        favorite mark cannot be written to the target
+    :raises StyleDatabaseNotFoundError: if the source style database does not exist
+    :raises StyleDatabaseError: if a style database cannot be loaded
+    :raises InvalidItemError: if a source item is invalid (null entity or empty name)
+    :raises ItemImportError: if an item's tags or favorite mark cannot be written to
+        the target
     """
     source_db_path = source_profile_path / "symbology-style.db"
     target_db_path = target_profile_path / "symbology-style.db"
+
+    # checked here so that both branches below raise the same exception
+    if not source_db_path.is_file():
+        raise StyleDatabaseNotFoundError(f"Style database not found: {source_db_path}")
 
     # try if we can straight up copy the file to the target profile
     if not target_db_path.is_file():
@@ -130,15 +142,27 @@ def import_style_items(source_profile_path: Path, target_profile_path: Path) -> 
             # add*() only returns False on null entity or empty name; SQLite write
             # errors are not reported upstream (see QgsStyle::addSymbol)
             if not getattr(target_style_db, add_fn)(name, entry, update=True):
-                raise ValueError(f"Invalid {type_name} in source: {name!r}")
+                raise InvalidItemError(
+                    f"Invalid {type_name} in source: {name!r}",
+                    item_type=type_name,
+                    item_name=name,
+                )
 
             # handle tags and favorite mark, if exist
             tags = source_style_db.tagsOfSymbol(entity_type, name)
             if tags and not target_style_db.tagSymbol(entity_type, name, tags):
-                raise RuntimeError(f"Failed to tag {type_name}: {name!r}")
+                raise ItemImportError(
+                    f"Failed to tag {type_name}: {name!r}",
+                    item_type=type_name,
+                    item_name=name,
+                )
             if name in favorite_names and not target_style_db.addFavorite(
                 entity_type, name
             ):
-                raise RuntimeError(f"Failed to mark {type_name} as favorite: {name!r}")
+                raise ItemImportError(
+                    f"Failed to mark {type_name} as favorite: {name!r}",
+                    item_type=type_name,
+                    item_name=name,
+                )
 
     # we do not need to save the target file
