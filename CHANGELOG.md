@@ -16,6 +16,11 @@ Unreleased
 
 -->
 
+## 0.8.1 - 2026-10-07
+
+* fix(style): QGIS version for Material Settings was matching 4.20.*instead of 4.2.* by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/150>
+* fix(python): replace assert statements with exception raise by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/149>
+
 ## 0.8.0 - 2026-10-05
 
 > 🤝 First release under the new QGIS Deployment organization
