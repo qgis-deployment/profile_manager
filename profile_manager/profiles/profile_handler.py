@@ -1,13 +1,20 @@
+# -- Imports --
+
+# standard lib
 import errno
 import re
 from os import rename
 from pathlib import Path
 from shutil import copytree, rmtree
-from sys import platform
 
+# PyQGIS
 from qgis.core import QgsApplication, QgsError, QgsUserProfileManager
 
-from profile_manager.profiles.utils import qgis_profiles_path
+# plugin
+from profile_manager.profiles.utils import (
+    get_profile_qgis_ini_path,
+    qgis_profiles_path,
+)
 
 
 # validation rule from QGIS' QgsUserProfileSelectionDialog
@@ -35,14 +42,9 @@ def create_profile(profile_name: str):
         )
 
     # Right now there is only the profile directory and the qgis.db in its root.
-    # We want to be able to write things to the profile's QGIS3.ini file so:
-    if platform == "darwin":
-        sub_dir = "qgis.org"
-    else:
-        sub_dir = "QGIS"
-    ini_dir_path = qgis_profiles_path() / profile_name / sub_dir
-    ini_dir_path.mkdir()
-    ini_path = ini_dir_path / "QGIS3.ini"
+    # We want to be able to write things to the profile's settings INI file so:
+    ini_path = get_profile_qgis_ini_path(profile_name)
+    ini_path.parent.mkdir(parents=True, exist_ok=True)
     ini_path.touch()
 
 
