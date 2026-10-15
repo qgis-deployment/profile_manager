@@ -2,6 +2,7 @@ from pathlib import Path
 
 from qgis.core import QgsBookmarkManager
 
+from profile_manager.exceptions import ItemImportError
 from profile_manager.toolbelt import PlgLogger
 
 
@@ -24,7 +25,8 @@ def import_bookmarks(source_bookmark_file: Path, target_bookmark_file: Path) -> 
     :param target_bookmark_file: path of bookmarks file to import to
     :type target_bookmark_file: Path
 
-    :raises RuntimeError: if a bookmark cannot be added to or updated in the target
+    :raises ItemImportError: if a bookmark cannot be added to or updated in the
+        target
     """
     # This function *could* use QgsApplication.bookmarkManager() as source but let's
     # keep it similar to the other functions and have similar source and target
@@ -60,9 +62,17 @@ def import_bookmarks(source_bookmark_file: Path, target_bookmark_file: Path) -> 
             # ID does not exist in target, we should copy the bookmark to it
             _, success = target_bmm.addBookmark(bookmark)
             if not success:
-                raise RuntimeError(f"Failed to add bookmark {bookmark.name()!r}")
+                raise ItemImportError(
+                    f"Failed to add bookmark {bookmark.name()!r}",
+                    item_type="bookmark",
+                    item_name=bookmark.name(),
+                )
         elif not target_bmm.updateBookmark(bookmark):
             # ID exists in target so updateBookmark() should be able to replace it
-            raise RuntimeError(f"Failed to update bookmark {bookmark.name()!r}")
+            raise ItemImportError(
+                f"Failed to update bookmark {bookmark.name()!r}",
+                item_type="bookmark",
+                item_name=bookmark.name(),
+            )
 
     del target_bmm  # flush the target file
