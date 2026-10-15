@@ -3,6 +3,7 @@ from shutil import copy2
 
 from qgis.PyQt.QtCore import QSettings
 
+from profile_manager.profiles.utils import get_qgis_ini_relative_path
 from profile_manager.toolbelt.log_handler import PlgLogger
 
 
@@ -35,10 +36,12 @@ def import_customizations(source_profile_path: Path, target_profile_path: Path):
 
     # Toggle UI customization depending on the setting in the source profile
     source_settings = QSettings(
-        str(source_profile_path / "QGIS" / "QGIS3.ini"), QSettings.Format.IniFormat
+        str(source_profile_path / get_qgis_ini_relative_path()),
+        QSettings.Format.IniFormat,
     )
     target_settings = QSettings(
-        str(target_profile_path / "QGIS" / "QGIS3.ini"), QSettings.Format.IniFormat
+        str(target_profile_path / get_qgis_ini_relative_path()),
+        QSettings.Format.IniFormat,
     )
     customization_setting = source_settings.value("UI/Customization/enabled", type=bool)
     if customization_setting is True:

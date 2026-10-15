@@ -1,20 +1,27 @@
+# -- Imports --
+
+# standard lib
 from configparser import NoSectionError, RawConfigParser
 from pathlib import Path
-from sys import platform
 from typing import Any, Dict, List, Optional
 
+# PyQGIS
 import pyplugin_installer
 from pyplugin_installer.installer_data import repositories
-from qgis.core import Qgis, QgsUserProfileManager
+from qgis.core import Qgis, QgsApplication, QgsSettings, QgsUserProfileManager
+from qgis.PyQt.QtCore import QCoreApplication
 from qgis.utils import iface
 
+# plugin
 from profile_manager.qdt_export.models import QdtPluginInformation
 from profile_manager.toolbelt import PlgLogger
 
 
+# -- Globals--
 logger = PlgLogger()
 
 
+# -- Functions --
 def qgis_profiles_path() -> Path:
     """Get QGIS profiles paths from current QGIS application
 
@@ -24,20 +31,34 @@ def qgis_profiles_path() -> Path:
     return Path(iface.userProfileManager().rootLocation())
 
 
-def get_profile_qgis_ini_path(profile_name: str) -> Path:
-    """Get QGIS3.ini file path for a profile
+def get_qgis_ini_relative_path() -> Path:
+    """Get the settings INI file path relative to a profile folder.
 
-    Args:
-        profile_name (str): profile name
-
-    Returns:
-        Path: QGIS3.ini path
+    :return: relative path
+    :rtype: Path
     """
-    # MacOS
-    if platform.startswith("darwin"):
-        return qgis_profiles_path() / profile_name / "qgis.org" / "QGIS3.ini"
-    # Windows / Linux
-    return qgis_profiles_path() / profile_name / "QGIS" / "QGIS3.ini"
+    active_ini = Path(QgsSettings().fileName())
+    try:
+        return active_ini.relative_to(QgsApplication.qgisSettingsDirPath())
+    except ValueError:
+        logger.log(
+            message=f"Settings file {active_ini} is not inside the active profile "
+            f"folder {QgsApplication.qgisSettingsDirPath()}, falling back to default.",
+            log_level=Qgis.MessageLevel.Warning,
+        )
+        return Path("QGIS") / f"{QCoreApplication.applicationName()}.ini"
+
+
+def get_profile_qgis_ini_path(profile_name: str) -> Path:
+    """Get the settings INI file path (QGIS3.ini, QGIS4.ini...) for a profile.
+
+    :param profile_name: profile name
+    :type profile_name: str
+
+    :return: settings INI file path
+    :rtype: Path
+    """
+    return qgis_profiles_path() / profile_name / get_qgis_ini_relative_path()
 
 
 def get_profile_plugin_metadata_path(profile_name: str, plugin_slug_name: str) -> Path:
