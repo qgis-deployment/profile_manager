@@ -24,3 +24,8 @@ server=False
 # versioning - automatically updated by qgis-plugin-ci during packaging and release process
 version=0.9.0-DEV
 changelog=
+
+[oslandia]
+funders=WhereGroup,Oslandia,ANFSI
+screenshot=docs/static/profile_manager_ui_tab_manage-profiles.png,docs/static/profile_manager_ui_tab_QDT-export.png,docs/static/profile_manager_ui_tab_share_data-sources.png,docs/static/profile_manager_ui_tab_share_other.png,docs/static/profile_manager_ui_tab_share_plugins.png
+issue_to_be_funded=https://github.com/qgis-deployment/profile_manager/issues?q=is:issue+state:open+label:enhancement
