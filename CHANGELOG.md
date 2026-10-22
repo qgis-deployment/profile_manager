@@ -16,6 +16,12 @@ Unreleased
 
 -->
 
+## 0.9.0 - 2026-10-22
+
+* improve(compatibility): resolve path to the profile QGIS*.ini file using dynamic variables by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/152>
+* improve(chore): use custom exceptions to distinguish expected errors from bugs by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/151>
+* add(metadata): Oslandia section informations by @florentfougeres in <https://github.com/qgis-deployment/profile_manager/pull/153>
+
 ## 0.8.1 - 2026-10-07
 
 * fix(style): QGIS version for Material Settings was matching 4.20.*instead of 4.2.* by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/150>
