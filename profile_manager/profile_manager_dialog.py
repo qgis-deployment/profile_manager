@@ -10,6 +10,7 @@ from qgis.PyQt.QtGui import QDesktopServices, QIcon
 from qgis.PyQt.QtWidgets import (
     QDialog,
     QDialogButtonBox,
+    QLabel,
     QListWidget,
     QMessageBox,
     QTreeWidget,
@@ -99,8 +100,25 @@ class ProfileManagerDialog(QtWidgets.QDialog):
         self.qdt_export_profile_cbx.setModel(self.profile_mdl)
 
         self.export_qdt_button.setEnabled(False)
+        self.__mark_qdt_required_fields()
 
         self.__setup_connections()
+
+    def __mark_qdt_required_fields(self) -> None:
+        """Flag QDT form fields required by the QDT profile schema."""
+        required_tooltip = self.tr("Required field")
+        for label, edit in (
+            (self.qdt_author_label, self.qdt_author_edit),
+            (self.qdt_email_label, self.qdt_email_edit),
+            (self.qdt_version_label, self.qdt_version_edit),
+        ):
+            label.setText(f"{label.text()} *")
+            label.setToolTip(required_tooltip)
+            edit.setToolTip(required_tooltip)
+
+        legend = QLabel(self.tr("* Required fields"), self)
+        legend.setEnabled(False)  # greyed out, like a hint
+        self.gridLayout.addWidget(legend, 10, 0, 1, 2)
 
     def __setup_connections(self) -> None:
         """Set up connections"""
