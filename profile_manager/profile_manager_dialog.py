@@ -199,6 +199,7 @@ class ProfileManagerDialog(QtWidgets.QDialog):
         """
         return QDTProfileInfos(
             description=self.qdt_description_edit.toPlainText(),
+            author=self.qdt_author_edit.text(),
             email=self.qdt_email_edit.text(),
             version=self.qdt_version_edit.text(),
             qgis_min_version=self.qdt_qgis_min_version_edit.text(),
@@ -212,6 +213,7 @@ class ProfileManagerDialog(QtWidgets.QDialog):
             qdt_profile_infos (QDTProfileInfos): QDT Profile Information
         """
         self.qdt_description_edit.setPlainText(qdt_profile_infos.description)
+        self.qdt_author_edit.setText(qdt_profile_infos.author)
         self.qdt_email_edit.setText(qdt_profile_infos.email)
         self.qdt_version_edit.setText(qdt_profile_infos.version)
         self.qdt_qgis_min_version_edit.setText(qdt_profile_infos.qgis_min_version)

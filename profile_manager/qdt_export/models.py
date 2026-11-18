@@ -55,6 +55,7 @@ class QDTProfileInfos:
     """Store informations for QDT profile creation"""
 
     description: str = ""
+    author: str = ""
     email: str = ""
     version: str = ""
     qgis_min_version: str = ""
