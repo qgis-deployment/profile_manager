@@ -21,7 +21,11 @@ from profile_manager.__about__ import DIR_PLUGIN_ROOT, __uri_homepage__
 from profile_manager.constants import QDT_PROFILE_REQUIRED_FIELDS
 from profile_manager.gui.mdl_profiles import ProfileListModel
 from profile_manager.gui.name_profile_dialog import NameProfileDialog
-from profile_manager.gui.utils import data_sources_as_tree, plugins_as_items
+from profile_manager.gui.utils import (
+    QVAL_EMAIL,
+    data_sources_as_tree,
+    plugins_as_items,
+)
 from profile_manager.profiles.utils import get_current_profile_name
 from profile_manager.qdt_export.models import QDTProfileInfos
 from profile_manager.qdt_export.profile_export import (
@@ -99,6 +103,7 @@ class ProfileManagerDialog(QtWidgets.QDialog):
 
         # tab2: QDT export
         self.qdt_export_profile_cbx.setModel(self.profile_mdl)
+        self.qdt_email_edit.setValidator(QVAL_EMAIL)
 
         self.export_qdt_button.setEnabled(False)
         self.__mark_qdt_required_fields()
