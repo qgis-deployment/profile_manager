@@ -15,6 +15,29 @@ class QdtPluginInformation:
     plugin_id: Optional[int] = None
     repository_url: Optional[str] = None
 
+    @classmethod
+    def from_dict(cls, plugin_dict: Dict[str, Any]) -> "QdtPluginInformation":
+        """Build a plugin from an item of the "plugins" list of a QDT profile.json.
+
+        :param plugin_dict: plugin as written into a QDT profile.json
+        :type plugin_dict: Dict[str, Any]
+
+        :return: plugin information
+        :rtype: QdtPluginInformation
+        """
+        repository_url = plugin_dict.get("repository_url_xml")
+        if not repository_url and plugin_dict.get("official_repository"):
+            repository_url = OFFICIAL_REPOSITORY_URL
+
+        return cls(
+            name=plugin_dict.get("name", ""),
+            folder_name=plugin_dict.get("folder_name", ""),
+            version=plugin_dict.get("version", ""),
+            download_url=plugin_dict.get("url"),
+            plugin_id=plugin_dict.get("plugin_id"),
+            repository_url=repository_url,
+        )
+
     def as_dict(self) -> Dict[str, Any]:
         """Custom as_dict method to handle properties and specific vars.
 

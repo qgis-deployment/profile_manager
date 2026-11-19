@@ -10,7 +10,6 @@ from qgis.PyQt.QtGui import QDesktopServices, QIcon
 from qgis.PyQt.QtWidgets import (
     QDialog,
     QDialogButtonBox,
-    QLabel,
     QListWidget,
     QMessageBox,
     QTreeWidget,
@@ -30,6 +29,7 @@ from profile_manager.profiles.utils import get_current_profile_name
 from profile_manager.qdt_export.models import QDTProfileInfos
 from profile_manager.qdt_export.profile_export import (
     export_profile_for_qdt,
+    get_qdt_plugins_from_file,
     get_qdt_profile_infos_from_file,
 )
 from profile_manager.utils import wait_cursor
@@ -106,6 +106,7 @@ class ProfileManagerDialog(QtWidgets.QDialog):
         self.qdt_email_edit.setValidator(QVAL_EMAIL)
 
         self.export_qdt_button.setEnabled(False)
+        self.qdt_plugins_group.setVisible(False)
         self.__mark_qdt_required_fields()
 
         self.__setup_connections()
@@ -123,10 +124,6 @@ class ProfileManagerDialog(QtWidgets.QDialog):
             label.setText(f"{label.text()} *")
             label.setToolTip(required_tooltip)
             edit.setToolTip(required_tooltip)
-
-        legend = QLabel(self.tr("* Required fields"), self)
-        legend.setEnabled(False)  # greyed out, like a hint
-        self.gridLayout.addWidget(legend, 10, 0, 1, 2)
 
     def __setup_connections(self) -> None:
         """Set up connections"""
@@ -205,17 +202,19 @@ class ProfileManagerDialog(QtWidgets.QDialog):
         """Update UI when QDT export dir is changed:
         - enabled/disable button
         - define QDTProfileInformations if profile.json file is available
+        - list plugins of profile.json file if available
         """
         export_dir = self.qdt_file_widget.filePath()
-        if export_dir:
-            self.export_qdt_button.setEnabled(True)
-            profile_json = Path(export_dir) / "profile.json"
-            if profile_json.exists():
-                self._set_qdt_profile_infos(
-                    get_qdt_profile_infos_from_file(profile_json)
-                )
+        profile_json = Path(export_dir) / "profile.json" if export_dir else None
+        self.export_qdt_button.setEnabled(bool(export_dir))
+
+        if profile_json and profile_json.is_file():
+            self._set_qdt_profile_infos(get_qdt_profile_infos_from_file(profile_json))
+            self.qdt_plugins_view.set_plugins(get_qdt_plugins_from_file(profile_json))
+            self.qdt_plugins_group.setVisible(True)
         else:
-            self.export_qdt_button.setEnabled(False)
+            self.qdt_plugins_view.clear()
+            self.qdt_plugins_group.setVisible(False)
 
     def _get_qdt_profile_infos(self) -> QDTProfileInfos:
         """Get QDTProfileInfos from UI

@@ -1,15 +1,18 @@
+# standard
 import json
 from pathlib import Path
 from shutil import copytree, rmtree
-from typing import Any, Dict
+from typing import Any, Dict, List
 
+# PyQGIS
 import pyplugin_installer
 
+# plugin
 from profile_manager.profiles.utils import (
     get_profile_plugin_list_information,
     qgis_profiles_path,
 )
-from profile_manager.qdt_export.models import QDTProfileInfos
+from profile_manager.qdt_export.models import QdtPluginInformation, QDTProfileInfos
 
 
 QDT_PROFILE_SCHEMA = "https://raw.githubusercontent.com/qgis-deployment/qgis-deployment-toolbelt-cli/main/docs/schemas/profile/qgis_profile.json"
@@ -25,7 +28,7 @@ def get_qdt_profile_infos_from_file(profile_file: Path) -> QDTProfileInfos:
     Returns:
         QDTProfileInfos: QDT Profile informations
     """
-    with open(profile_file, "r") as f:
+    with profile_file.open(encoding="UTF-8") as f:
         qdt_profile_data = json.load(f)
         return QDTProfileInfos(
             description=qdt_profile_data.get("description", ""),
@@ -35,6 +38,24 @@ def get_qdt_profile_infos_from_file(profile_file: Path) -> QDTProfileInfos:
             qgis_min_version=qdt_profile_data.get("qgisMinimumVersion", ""),
             qgis_max_version=qdt_profile_data.get("qgisMaximumVersion", ""),
         )
+
+
+def get_qdt_plugins_from_file(profile_file: Path) -> List[QdtPluginInformation]:
+    """Get plugins listed in a QDT profile.json file.
+
+    Args:
+        profile_file (Path): profile.json path
+
+    Returns:
+        List[QdtPluginInformation]: plugins of the QDT profile
+    """
+    with profile_file.open(encoding="UTF-8") as f:
+        qdt_profile_data = json.load(f)
+    return [
+        QdtPluginInformation.from_dict(plugin)
+        for plugin in qdt_profile_data.get("plugins", [])
+        if isinstance(plugin, dict)
+    ]
 
 
 def qdt_profile_dict(
