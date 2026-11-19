@@ -10,7 +10,6 @@ from qgis.PyQt.QtGui import QDesktopServices, QIcon
 from qgis.PyQt.QtWidgets import (
     QDialog,
     QDialogButtonBox,
-    QLabel,
     QListWidget,
     QMessageBox,
     QTreeWidget,
@@ -124,10 +123,6 @@ class ProfileManagerDialog(QtWidgets.QDialog):
             label.setToolTip(required_tooltip)
             edit.setToolTip(required_tooltip)
 
-        legend = QLabel(self.tr("* Required fields"), self)
-        legend.setEnabled(False)  # greyed out, like a hint
-        self.gridLayout.addWidget(legend, 10, 0, 1, 2)
-
     def __setup_connections(self) -> None:
         """Set up connections"""
         # buttons
@@ -151,6 +146,7 @@ class ProfileManagerDialog(QtWidgets.QDialog):
 
         self.export_qdt_button.clicked.connect(self.export_qdt_handler)
         self.qdt_file_widget.fileChanged.connect(self._qdt_export_dir_changed)
+        self.qdt_import_file_widget.fileChanged.connect(self._qdt_import_file_changed)
 
         # checkbox
         self.checkBox_checkAll.stateChanged.connect(self.__toggle_all_items)
@@ -202,20 +198,24 @@ class ProfileManagerDialog(QtWidgets.QDialog):
         return None
 
     def _qdt_export_dir_changed(self) -> None:
-        """Update UI when QDT export dir is changed:
-        - enabled/disable button
-        - define QDTProfileInformations if profile.json file is available
-        """
-        export_dir = self.qdt_file_widget.filePath()
-        if export_dir:
-            self.export_qdt_button.setEnabled(True)
-            profile_json = Path(export_dir) / "profile.json"
-            if profile_json.exists():
-                self._set_qdt_profile_infos(
-                    get_qdt_profile_infos_from_file(profile_json)
-                )
-        else:
-            self.export_qdt_button.setEnabled(False)
+        """Enable export button only when an export folder is defined"""
+        self.export_qdt_button.setEnabled(bool(self.qdt_file_widget.filePath()))
+
+    def _qdt_import_file_changed(self) -> None:
+        """Fill the QDT form with the metadata of the selected profile.json"""
+        profile_json = Path(self.qdt_import_file_widget.filePath())
+        if not profile_json.is_file():
+            return
+        try:
+            self._set_qdt_profile_infos(get_qdt_profile_infos_from_file(profile_json))
+        except (OSError, ValueError) as err:
+            QMessageBox.warning(
+                self,
+                self.tr("QDT profile import"),
+                self.tr("Unable to read QDT profile {path}:\n{error}").format(
+                    path=profile_json, error=err
+                ),
+            )
 
     def _get_qdt_profile_infos(self) -> QDTProfileInfos:
         """Get QDTProfileInfos from UI

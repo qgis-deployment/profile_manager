@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>739</width>
-    <height>519</height>
+    <height>670</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,7 +29,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_profiles">
       <attribute name="title">
@@ -392,69 +392,50 @@
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
        <item row="3" column="0">
-        <widget class="QLabel" name="qdt_author_label">
-         <property name="text">
-          <string>Author</string>
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Export</string>
          </property>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <item row="3" column="1">
+           <widget class="QCheckBox" name="qdt_inactive_plugin_export_checkbox">
+            <property name="text">
+             <string>Include inactive plugins</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QgsFileWidget" name="qdt_file_widget">
+            <property name="storageMode">
+             <enum>QgsFileWidget::GetDirectory</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" rowspan="2" colspan="2">
+           <widget class="QLabel" name="lbl_export_folder">
+            <property name="text">
+             <string>Export folder:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QPushButton" name="export_qdt_button">
+            <property name="text">
+             <string>Export</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QCheckBox" name="qdt_clear_export_folder_checkbox">
+            <property name="text">
+             <string>Clear export folder</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
-       <item row="3" column="1">
-        <widget class="QLineEdit" name="qdt_author_edit"/>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="qdt_profile_label">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Profile</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="qdt_qgis_min_version_label">
-         <property name="text">
-          <string>QGIS min. version</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="qdt_description_label">
-         <property name="text">
-          <string>Description</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1" colspan="2">
-        <widget class="QComboBox" name="qdt_export_profile_cbx"/>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="qdt_email_label">
-         <property name="text">
-          <string>Email</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QLineEdit" name="qdt_email_edit"/>
-       </item>
-       <item row="5" column="1">
-        <widget class="QLineEdit" name="qdt_version_edit"/>
-       </item>
-       <item row="9" column="0" colspan="2">
-        <widget class="QCheckBox" name="qdt_clear_export_folder_checkbox">
-         <property name="text">
-          <string>Clear export folder</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <widget class="QLineEdit" name="qdt_qgis_min_version_edit"/>
-       </item>
-       <item row="12" column="0" colspan="3">
+       <item row="7" column="0" colspan="3">
         <spacer name="verticalSpacer_4">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -467,52 +448,156 @@
          </property>
         </spacer>
        </item>
-       <item row="8" column="0" colspan="2">
-        <widget class="QCheckBox" name="qdt_inactive_plugin_export_checkbox">
-         <property name="text">
-          <string>Export inactive plugins</string>
+       <item row="0" column="0" colspan="2">
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Profile to export</string>
          </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="qdt_version_label">
-         <property name="text">
-          <string>Version</string>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="0" colspan="3">
-        <widget class="QPushButton" name="export_qdt_button">
-         <property name="text">
-          <string>Export</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="qdt_qgis_max_version_label">
-         <property name="text">
-          <string>QGIS max. version</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1">
-        <widget class="QLineEdit" name="qdt_qgis_max_version_edit"/>
-       </item>
-       <item row="2" column="1">
-        <widget class="QTextEdit" name="qdt_description_edit"/>
-       </item>
-       <item row="0" column="1">
-        <widget class="QgsFileWidget" name="qdt_file_widget">
-         <property name="storageMode">
-          <enum>QgsFileWidget::GetDirectory</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="lbl_export_folder">
-         <property name="text">
-          <string>Export folder</string>
-         </property>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="1" column="1">
+           <widget class="QComboBox" name="qdt_export_profile_cbx"/>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="qdt_email_label">
+            <property name="text">
+             <string>Email contact:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QgsFileWidget" name="qdt_import_file_widget">
+            <property name="toolTip">
+             <string>Fill the form below with the metadata of an existing QDT profile.json</string>
+            </property>
+            <property name="filter">
+             <string>QDT profile (profile.json);;JSON (*.json)</string>
+            </property>
+            <property name="storageMode">
+             <enum>QgsFileWidget::GetFile</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="qdt_email_edit"/>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="qdt_author_label">
+            <property name="text">
+             <string>Maintainer:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="qdt_import_label">
+            <property name="text">
+             <string>Fill from existing profile.json:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="qdt_profile_label">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Installed profile to export:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QTextEdit" name="qdt_description_edit">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>80</height>
+             </size>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QAbstractScrollArea::AdjustToContents</enum>
+            </property>
+            <property name="markdown">
+             <string notr="true"/>
+            </property>
+            <property name="acceptRichText">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0">
+           <widget class="QLabel" name="qdt_required_legend">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="cursor">
+             <cursorShape>IBeamCursor</cursorShape>
+            </property>
+            <property name="contextMenuPolicy">
+             <enum>Qt::NoContextMenu</enum>
+            </property>
+            <property name="text">
+             <string>* Required fields</string>
+            </property>
+            <property name="textInteractionFlags">
+             <set>Qt::NoTextInteraction</set>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="qdt_author_edit"/>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="qdt_version_label">
+            <property name="text">
+             <string>Version:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLineEdit" name="qdt_version_edit"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="qdt_description_label">
+            <property name="text">
+             <string>Description:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0" colspan="2">
+           <layout class="QHBoxLayout" name="qdt_qgis_versions_layout">
+            <item>
+             <widget class="QLabel" name="qdt_qgis_min_version_label">
+              <property name="text">
+               <string>QGIS min. version:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="qdt_qgis_min_version_edit"/>
+            </item>
+            <item>
+             <widget class="QLabel" name="qdt_qgis_max_version_label">
+              <property name="text">
+               <string>QGIS max. version:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="qdt_qgis_max_version_edit"/>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
