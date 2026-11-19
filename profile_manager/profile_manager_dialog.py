@@ -18,6 +18,7 @@ from qgis.PyQt.QtWidgets import (
 
 # plugin
 from profile_manager.__about__ import DIR_PLUGIN_ROOT, __uri_homepage__
+from profile_manager.constants import QDT_PROFILE_REQUIRED_FIELDS
 from profile_manager.gui.mdl_profiles import ProfileListModel
 from profile_manager.gui.name_profile_dialog import NameProfileDialog
 from profile_manager.gui.utils import data_sources_as_tree, plugins_as_items
@@ -105,13 +106,15 @@ class ProfileManagerDialog(QtWidgets.QDialog):
         self.__setup_connections()
 
     def __mark_qdt_required_fields(self) -> None:
-        """Flag QDT form fields required by the QDT profile schema."""
+        """Flag QDT form fields required by the QDT profile schema.
+
+        Widgets are looked up from QDT_PROFILE_REQUIRED_FIELDS through the naming
+        convention qdt_<field>_label / qdt_<field>_edit.
+        """
         required_tooltip = self.tr("Required field")
-        for label, edit in (
-            (self.qdt_author_label, self.qdt_author_edit),
-            (self.qdt_email_label, self.qdt_email_edit),
-            (self.qdt_version_label, self.qdt_version_edit),
-        ):
+        for field in QDT_PROFILE_REQUIRED_FIELDS:
+            label = getattr(self, f"qdt_{field}_label")
+            edit = getattr(self, f"qdt_{field}_edit")
             label.setText(f"{label.text()} *")
             label.setToolTip(required_tooltip)
             edit.setToolTip(required_tooltip)
