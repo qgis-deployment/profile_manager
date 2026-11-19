@@ -207,7 +207,9 @@ class ProfileManagerDialog(QtWidgets.QDialog):
         if not profile_json.is_file():
             return
         try:
-            self._set_qdt_profile_infos(get_qdt_profile_infos_from_file(profile_json))
+            qdt_profile_infos = get_qdt_profile_infos_from_file(profile_json)
+            self._set_qdt_profile_infos(qdt_profile_infos)
+            self._select_qdt_export_profile(qdt_profile_infos)
         except (OSError, ValueError) as err:
             QMessageBox.warning(
                 self,
@@ -216,6 +218,21 @@ class ProfileManagerDialog(QtWidgets.QDialog):
                     path=profile_json, error=err
                 ),
             )
+
+    def _select_qdt_export_profile(self, qdt_profile_infos: QDTProfileInfos) -> None:
+        """Point the export profile combobox to the profile matching the imported
+        profile.json, if it exists locally.
+
+        Args:
+            qdt_profile_infos (QDTProfileInfos): QDT Profile Information
+        """
+        for candidate in (qdt_profile_infos.folder_name, qdt_profile_infos.name):
+            if not candidate:
+                continue
+            index = self.qdt_export_profile_cbx.findText(candidate)
+            if index >= 0:
+                self.qdt_export_profile_cbx.setCurrentIndex(index)
+                return
 
     def _get_qdt_profile_infos(self) -> QDTProfileInfos:
         """Get QDTProfileInfos from UI

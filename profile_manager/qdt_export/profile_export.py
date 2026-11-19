@@ -28,6 +28,8 @@ def get_qdt_profile_infos_from_file(profile_file: Path) -> QDTProfileInfos:
     with open(profile_file, "r") as f:
         qdt_profile_data = json.load(f)
         return QDTProfileInfos(
+            name=qdt_profile_data.get("name", ""),
+            folder_name=qdt_profile_data.get("folder_name", ""),
             description=qdt_profile_data.get("description", ""),
             author=qdt_profile_data.get("author", ""),
             email=qdt_profile_data.get("email", ""),
