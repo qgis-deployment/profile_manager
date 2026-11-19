@@ -10,6 +10,7 @@ from qgis.PyQt.QtGui import QDesktopServices, QIcon
 from qgis.PyQt.QtWidgets import (
     QDialog,
     QDialogButtonBox,
+    QLabel,
     QListWidget,
     QMessageBox,
     QTreeWidget,
@@ -17,9 +18,14 @@ from qgis.PyQt.QtWidgets import (
 
 # plugin
 from profile_manager.__about__ import DIR_PLUGIN_ROOT, __uri_homepage__
+from profile_manager.constants import QDT_PROFILE_REQUIRED_FIELDS
 from profile_manager.gui.mdl_profiles import ProfileListModel
 from profile_manager.gui.name_profile_dialog import NameProfileDialog
-from profile_manager.gui.utils import data_sources_as_tree, plugins_as_items
+from profile_manager.gui.utils import (
+    QVAL_EMAIL,
+    data_sources_as_tree,
+    plugins_as_items,
+)
 from profile_manager.profiles.utils import get_current_profile_name
 from profile_manager.qdt_export.models import QDTProfileInfos
 from profile_manager.qdt_export.profile_export import (
@@ -97,10 +103,30 @@ class ProfileManagerDialog(QtWidgets.QDialog):
 
         # tab2: QDT export
         self.qdt_export_profile_cbx.setModel(self.profile_mdl)
+        self.qdt_email_edit.setValidator(QVAL_EMAIL)
 
         self.export_qdt_button.setEnabled(False)
+        self.__mark_qdt_required_fields()
 
         self.__setup_connections()
+
+    def __mark_qdt_required_fields(self) -> None:
+        """Flag QDT form fields required by the QDT profile schema.
+
+        Widgets are looked up from QDT_PROFILE_REQUIRED_FIELDS through the naming
+        convention qdt_<field>_label / qdt_<field>_edit.
+        """
+        required_tooltip = self.tr("Required field")
+        for field in QDT_PROFILE_REQUIRED_FIELDS:
+            label = getattr(self, f"qdt_{field}_label")
+            edit = getattr(self, f"qdt_{field}_edit")
+            label.setText(f"{label.text()} *")
+            label.setToolTip(required_tooltip)
+            edit.setToolTip(required_tooltip)
+
+        legend = QLabel(self.tr("* Required fields"), self)
+        legend.setEnabled(False)  # greyed out, like a hint
+        self.gridLayout.addWidget(legend, 10, 0, 1, 2)
 
     def __setup_connections(self) -> None:
         """Set up connections"""
@@ -199,6 +225,7 @@ class ProfileManagerDialog(QtWidgets.QDialog):
         """
         return QDTProfileInfos(
             description=self.qdt_description_edit.toPlainText(),
+            author=self.qdt_author_edit.text(),
             email=self.qdt_email_edit.text(),
             version=self.qdt_version_edit.text(),
             qgis_min_version=self.qdt_qgis_min_version_edit.text(),
@@ -212,6 +239,7 @@ class ProfileManagerDialog(QtWidgets.QDialog):
             qdt_profile_infos (QDTProfileInfos): QDT Profile Information
         """
         self.qdt_description_edit.setPlainText(qdt_profile_infos.description)
+        self.qdt_author_edit.setText(qdt_profile_infos.author)
         self.qdt_email_edit.setText(qdt_profile_infos.email)
         self.qdt_version_edit.setText(qdt_profile_infos.version)
         self.qdt_qgis_min_version_edit.setText(qdt_profile_infos.qgis_min_version)

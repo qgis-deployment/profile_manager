@@ -29,6 +29,7 @@ def get_qdt_profile_infos_from_file(profile_file: Path) -> QDTProfileInfos:
         qdt_profile_data = json.load(f)
         return QDTProfileInfos(
             description=qdt_profile_data.get("description", ""),
+            author=qdt_profile_data.get("author", ""),
             email=qdt_profile_data.get("email", ""),
             version=qdt_profile_data.get("version", ""),
             qgis_min_version=qdt_profile_data.get("qgisMinimumVersion", ""),
@@ -67,6 +68,7 @@ def qdt_profile_dict(
         "name": profile_name,
         "folder_name": profile_name,  # TODO check for profile with space
         "description": qdt_profile_infos.description,
+        "author": qdt_profile_infos.author,
         "email": qdt_profile_infos.email,
         "icon": "TDB",  # TODO add icon
         "qgisMinimumVersion": qdt_profile_infos.qgis_min_version,

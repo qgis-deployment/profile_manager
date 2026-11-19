@@ -1,5 +1,17 @@
-from qgis.PyQt.QtCore import Qt
+# PyQGIS
+from qgis.PyQt.QtCore import QRegularExpression, Qt
+from qgis.PyQt.QtGui import QRegularExpressionValidator
 from qgis.PyQt.QtWidgets import QListWidgetItem, QTreeWidgetItem
+
+
+# -- VALIDATORS
+
+# emails
+_email_qreg = QRegularExpression(
+    "\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b",
+    QRegularExpression.PatternOption.CaseInsensitiveOption,
+)
+QVAL_EMAIL = QRegularExpressionValidator(_email_qreg)
 
 
 def data_sources_as_tree(
