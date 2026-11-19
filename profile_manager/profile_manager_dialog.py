@@ -22,6 +22,8 @@ from profile_manager.gui.mdl_profiles import ProfileListModel
 from profile_manager.gui.name_profile_dialog import NameProfileDialog
 from profile_manager.gui.utils import (
     QVAL_EMAIL,
+    QVAL_VERSION,
+    VERSION_MAX_LENGTH,
     data_sources_as_tree,
     plugins_as_items,
 )
@@ -103,6 +105,13 @@ class ProfileManagerDialog(QtWidgets.QDialog):
         # tab2: QDT export
         self.qdt_export_profile_cbx.setModel(self.profile_mdl)
         self.qdt_email_edit.setValidator(QVAL_EMAIL)
+        for version_edit in (
+            self.qdt_version_edit,
+            self.qdt_qgis_min_version_edit,
+            self.qdt_qgis_max_version_edit,
+        ):
+            version_edit.setValidator(QVAL_VERSION)
+            version_edit.setMaxLength(VERSION_MAX_LENGTH)
 
         self.export_qdt_button.setEnabled(False)
         self.__mark_qdt_required_fields()
