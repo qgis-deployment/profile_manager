@@ -5,14 +5,16 @@ from typing import Any, Dict
 
 import pyplugin_installer
 
+from profile_manager.constants import (
+    QDT_EXPORT_EXCLUDED_DIRS,
+    QDT_PROFILE_FILENAME,
+    QDT_PROFILE_SCHEMA_URL,
+)
 from profile_manager.profiles.utils import (
     get_profile_plugin_list_information,
     qgis_profiles_path,
 )
 from profile_manager.qdt_export.models import QDTProfileInfos
-
-
-QDT_PROFILE_SCHEMA = "https://raw.githubusercontent.com/qgis-deployment/qgis-deployment-toolbelt-cli/main/docs/schemas/profile/qgis_profile.json"
 
 
 def get_qdt_profile_infos_from_file(profile_file: Path) -> QDTProfileInfos:
@@ -66,7 +68,7 @@ def qdt_profile_dict(
     )
 
     return {
-        "$schema": QDT_PROFILE_SCHEMA,
+        "$schema": QDT_PROFILE_SCHEMA_URL,
         "name": profile_name,
         "folder_name": profile_name,  # TODO check for profile with space
         "description": qdt_profile_infos.description,
@@ -109,12 +111,9 @@ def export_profile_for_qdt(
         dirs_exist_ok=True,
     )
 
-    # Delete cache content
-    rmtree(export_path / "cache", ignore_errors=True)
-    rmtree(export_path / "oauth2-cache", ignore_errors=True)
-
-    # Delete python/plugins content
-    rmtree(export_path / "python" / "plugins", ignore_errors=True)
+    # Delete caches and installed plugins (QDT installs them from profile.json)
+    for excluded_dir in QDT_EXPORT_EXCLUDED_DIRS:
+        rmtree(export_path / excluded_dir, ignore_errors=True)
 
     profile_dict = qdt_profile_dict(
         profile_name=profile_name,
@@ -122,5 +121,5 @@ def export_profile_for_qdt(
         export_inactive_plugin=export_inactive_plugin,
     )
 
-    with open(export_path / "profile.json", "w", encoding="UTF-8") as f:
+    with open(export_path / QDT_PROFILE_FILENAME, "w", encoding="UTF-8") as f:
         json.dump(profile_dict, f, indent=4)

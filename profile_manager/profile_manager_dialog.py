@@ -17,13 +17,15 @@ from qgis.PyQt.QtWidgets import (
 
 # plugin
 from profile_manager.__about__ import DIR_PLUGIN_ROOT, __uri_homepage__
-from profile_manager.constants import QDT_PROFILE_REQUIRED_FIELDS
+from profile_manager.constants import (
+    QDT_PROFILE_REQUIRED_FIELDS,
+    QDT_VERSION_MAX_LENGTH,
+)
 from profile_manager.gui.mdl_profiles import ProfileListModel
 from profile_manager.gui.name_profile_dialog import NameProfileDialog
 from profile_manager.gui.utils import (
     QVAL_EMAIL,
     QVAL_VERSION,
-    VERSION_MAX_LENGTH,
     data_sources_as_tree,
     plugins_as_items,
 )
@@ -111,7 +113,7 @@ class ProfileManagerDialog(QtWidgets.QDialog):
             self.qdt_qgis_max_version_edit,
         ):
             version_edit.setValidator(QVAL_VERSION)
-            version_edit.setMaxLength(VERSION_MAX_LENGTH)
+            version_edit.setMaxLength(QDT_VERSION_MAX_LENGTH)
 
         self.export_qdt_button.setEnabled(False)
         self.__mark_qdt_required_fields()
@@ -211,7 +213,7 @@ class ProfileManagerDialog(QtWidgets.QDialog):
         self.export_qdt_button.setEnabled(bool(self.qdt_file_widget.filePath()))
 
     def _qdt_import_file_changed(self) -> None:
-        """Fill the QDT form with the metadata of the selected profile.json"""
+        """Fill the QDT form with the metadata of the selected QDT profile file"""
         profile_json = Path(self.qdt_import_file_widget.filePath())
         if not profile_json.is_file():
             return

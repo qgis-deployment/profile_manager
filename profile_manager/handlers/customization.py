@@ -3,6 +3,7 @@ from shutil import copy2
 
 from qgis.PyQt.QtCore import QSettings
 
+from profile_manager.constants import QGIS_SETTINGS_CUSTOMIZATION_ENABLED_KEY
 from profile_manager.profiles.utils import get_qgis_ini_relative_path
 from profile_manager.toolbelt.log_handler import PlgLogger
 
@@ -43,12 +44,14 @@ def import_customizations(source_profile_path: Path, target_profile_path: Path):
         str(target_profile_path / get_qgis_ini_relative_path()),
         QSettings.Format.IniFormat,
     )
-    customization_setting = source_settings.value("UI/Customization/enabled", type=bool)
+    customization_setting = source_settings.value(
+        QGIS_SETTINGS_CUSTOMIZATION_ENABLED_KEY, type=bool
+    )
     if customization_setting is True:
-        target_settings.setValue("UI/Customization/enabled", True)
+        target_settings.setValue(QGIS_SETTINGS_CUSTOMIZATION_ENABLED_KEY, True)
         logger.log("Enabling UI customization in target profile")
     elif customization_setting is False:
-        target_settings.setValue("UI/Customization/enabled", False)
+        target_settings.setValue(QGIS_SETTINGS_CUSTOMIZATION_ENABLED_KEY, False)
         logger.log("Disabling UI customization in target profile")
 
     # writing the target file is handled by QSettings’s destructor

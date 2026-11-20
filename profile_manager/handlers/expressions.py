@@ -2,6 +2,11 @@ from pathlib import Path
 
 from qgis.PyQt.QtCore import QSettings
 
+from profile_manager.constants import (
+    QGIS_SETTINGS_EXPRESSION_HELP_TEXT_KEY,
+    QGIS_SETTINGS_EXPRESSION_KEY,
+    QGIS_SETTINGS_EXPRESSIONS_GROUP,
+)
 from profile_manager.toolbelt.log_handler import PlgLogger
 
 
@@ -35,12 +40,14 @@ def import_expressions(source_qgis_ini_file: Path, target_qgis_ini_file: Path):
     target_settings = QSettings(str(target_qgis_ini_file), QSettings.Format.IniFormat)
 
     # go into the "user" group of the "expressions" section
-    source_settings.beginGroup("expressions/user")
+    source_settings.beginGroup(QGIS_SETTINGS_EXPRESSIONS_GROUP)
     if not source_settings.childGroups():
         logger.log("No expressions found in source profile")
         return
 
-    target_settings.beginGroup("expressions/user")  # will be created as needed
+    target_settings.beginGroup(
+        QGIS_SETTINGS_EXPRESSIONS_GROUP
+    )  # will be created as needed
 
     # Expressions use two lines each, as child groups:
     # - expressions/user/FOO/expression
@@ -55,13 +62,21 @@ def import_expressions(source_qgis_ini_file: Path, target_qgis_ini_file: Path):
         logger.log(f"Copying expression: {source_expression_name}")
 
         source_settings.beginGroup(source_expression_name)
-        source_expression_expression = source_settings.value("expression")
-        source_expression_helptext = source_settings.value("helpText")
+        source_expression_expression = source_settings.value(
+            QGIS_SETTINGS_EXPRESSION_KEY
+        )
+        source_expression_helptext = source_settings.value(
+            QGIS_SETTINGS_EXPRESSION_HELP_TEXT_KEY
+        )
         source_settings.endGroup()
 
         target_settings.beginGroup(source_expression_name)
-        target_settings.setValue("expression", source_expression_expression)
-        target_settings.setValue("helpText", source_expression_helptext)
+        target_settings.setValue(
+            QGIS_SETTINGS_EXPRESSION_KEY, source_expression_expression
+        )
+        target_settings.setValue(
+            QGIS_SETTINGS_EXPRESSION_HELP_TEXT_KEY, source_expression_helptext
+        )
         target_settings.endGroup()
 
     # writing the target file is handled by QSettings’s destructor
