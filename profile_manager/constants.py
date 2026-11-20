@@ -59,6 +59,7 @@ QDT_EXPORT_EXCLUDED_DIRS: Tuple[Path, ...] = (
     PROFILE_PLUGINS_DIR,
 )
 QDT_PROFILE_FILENAME: str = "profile.json"
+QDT_PROFILE_IMAGES_DIR: Path = Path("images")
 QDT_PROFILE_REQUIRED_FIELDS: Tuple[str, ...] = ("author", "email", "version")
 QDT_PROFILE_SCHEMA_URL: str = (
     "https://raw.githubusercontent.com/qgis-deployment/"

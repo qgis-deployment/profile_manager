@@ -11,6 +11,7 @@ import pyplugin_installer
 from profile_manager.constants import (
     QDT_EXPORT_EXCLUDED_DIRS,
     QDT_PROFILE_FILENAME,
+    QDT_PROFILE_IMAGES_DIR,
     QDT_PROFILE_SCHEMA_URL,
 )
 from profile_manager.profiles.utils import (
@@ -105,8 +106,9 @@ def _export_icon(
 ) -> str:
     """Write the icon into the export folder and return its relative path.
 
-    The icon keeps its relative location when it lies in the source profile or in
-    the export folder. Otherwise it is copied at the root of the export folder.
+    The icon keeps its relative location when it comes fomr the source profile or in
+    the export folder. Otherwise it is copied into the images subfolder, following
+    the QDT profile convention.
 
     Args:
         icon_path (Path): local icon path
@@ -123,7 +125,7 @@ def _export_icon(
             icon_relative_path = icon_path.relative_to(base_folder)
             break
     else:
-        icon_relative_path = Path(icon_path.name)
+        icon_relative_path = QDT_PROFILE_IMAGES_DIR / icon_path.name
 
     target_icon_path = export_path / icon_relative_path
     target_icon_path.parent.mkdir(parents=True, exist_ok=True)
