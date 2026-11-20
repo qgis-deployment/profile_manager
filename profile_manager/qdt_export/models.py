@@ -58,6 +58,7 @@ class QDTProfileInfos:
     description: str = ""
     email: str = ""
     folder_name: str = ""
+    icon: str = ""  # local path to the icon file
     name: str = ""
     qgis_min_version: str = ""
     qgis_max_version: str = ""
