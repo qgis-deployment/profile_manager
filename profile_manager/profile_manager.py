@@ -17,6 +17,11 @@ from qgis.PyQt.QtWidgets import QAction, QWidget
 
 # project
 from profile_manager.__about__ import DIR_PLUGIN_ROOT, __icon_path__, __title__
+from profile_manager.constants import (
+    BACKUP_DIR_NAME,
+    PROFILE_BOOKMARKS_FILENAME,
+    QGIS_SETTINGS_LOCALE_KEY,
+)
 from profile_manager.handlers.bookmarks import import_bookmarks
 from profile_manager.handlers.customization import import_customizations
 from profile_manager.handlers.data_sources import (
@@ -62,14 +67,14 @@ class ProfileManager:
         self.log = PlgLogger().log
 
         # attributes
-        self.backup_path = Path.home() / "QGIS Profile Manager Backup"
+        self.backup_path = Path.home() / BACKUP_DIR_NAME
         self.qgs_profile_manager: Optional[QgsUserProfileManager] = None
         self.__dlg: Optional[ProfileManagerDialog] = None
 
         # initialize the locale
-        self.locale: str = QgsSettings().value("locale/userLocale", QLocale().name())[
-            0:2
-        ]
+        self.locale: str = QgsSettings().value(
+            QGIS_SETTINGS_LOCALE_KEY, QLocale().name()
+        )[0:2]
         locale_path: Path = (
             DIR_PLUGIN_ROOT
             / f"resources/i18n/{__title__.lower().replace(' ', '_')}_{self.locale}.qm"
@@ -294,8 +299,8 @@ class ProfileManager:
             self.log(self.tr("Importing bookmarks..."))
             try:
                 import_bookmarks(
-                    self.source_profile_path / "bookmarks.xml",
-                    self.target_profile_path / "bookmarks.xml",
+                    self.source_profile_path / PROFILE_BOOKMARKS_FILENAME,
+                    self.target_profile_path / PROFILE_BOOKMARKS_FILENAME,
                 )
             except Exception as e:
                 error_messages.append(

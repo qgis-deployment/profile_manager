@@ -1,6 +1,7 @@
 from pathlib import Path
 from shutil import copy2
 
+from profile_manager.constants import PROFILE_SCRIPTS_DIR, PYTHON_FILES_GLOB
 from profile_manager.toolbelt.log_handler import PlgLogger
 
 
@@ -25,8 +26,8 @@ def import_scripts(source_profile_path: Path, target_profile_path: Path):
         source_profile_path: Path of profile directory to import from
         target_profile_path: Path of profile directory to import to
     """
-    source_scripts_dir = source_profile_path / "processing" / "scripts"
-    target_scripts_dir = target_profile_path / "processing" / "scripts"
+    source_scripts_dir = source_profile_path / PROFILE_SCRIPTS_DIR
+    target_scripts_dir = target_profile_path / PROFILE_SCRIPTS_DIR
 
     if not source_scripts_dir.exists():
         logger.log("No Processing python scripts found in source profile")
@@ -35,7 +36,7 @@ def import_scripts(source_profile_path: Path, target_profile_path: Path):
     if not target_scripts_dir.exists():
         target_scripts_dir.mkdir(parents=True, exist_ok=True)
 
-    for python_file in Path(source_scripts_dir).glob("*.py"):
+    for python_file in Path(source_scripts_dir).glob(PYTHON_FILES_GLOB):
         filename = python_file.name
         logger.log(f"Copying Processing python script: {filename}")
         dest = target_scripts_dir / filename

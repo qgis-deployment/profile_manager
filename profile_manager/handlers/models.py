@@ -1,6 +1,7 @@
 from pathlib import Path
 from shutil import copy2
 
+from profile_manager.constants import PROFILE_MODELS_DIR, PROFILE_MODELS_GLOB
 from profile_manager.toolbelt.log_handler import PlgLogger
 
 
@@ -25,8 +26,8 @@ def import_models(source_profile_path: Path, target_profile_path: Path):
         source_profile_path: Path of profile directory to import from
         target_profile_path: Path of profile directory to import to
     """
-    source_models_dir = source_profile_path / "processing" / "models"
-    target_models_dir = target_profile_path / "processing" / "models"
+    source_models_dir = source_profile_path / PROFILE_MODELS_DIR
+    target_models_dir = target_profile_path / PROFILE_MODELS_DIR
 
     if not source_models_dir.exists():
         logger.log("No model files found in source profile")
@@ -35,7 +36,7 @@ def import_models(source_profile_path: Path, target_profile_path: Path):
     if not target_models_dir.exists():
         target_models_dir.mkdir(parents=True, exist_ok=True)
 
-    for model_file in Path(source_models_dir).glob("*.model3"):
+    for model_file in Path(source_models_dir).glob(PROFILE_MODELS_GLOB):
         filename = model_file.name
         logger.log(f"Copying model file: {filename}")
         dest = target_models_dir / filename

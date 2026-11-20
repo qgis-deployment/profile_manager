@@ -13,6 +13,12 @@ from qgis.PyQt.QtCore import QCoreApplication
 from qgis.utils import iface
 
 # plugin
+from profile_manager.constants import (
+    PLUGIN_METADATA_FILENAME,
+    PLUGIN_METADATA_SECTION,
+    PROFILE_PLUGINS_DIR,
+    QGIS_SETTINGS_PLUGINS_SECTION,
+)
 from profile_manager.qdt_export.models import QdtPluginInformation
 from profile_manager.toolbelt import PlgLogger
 
@@ -74,10 +80,9 @@ def get_profile_plugin_metadata_path(profile_name: str, plugin_slug_name: str) -
     return (
         qgis_profiles_path()
         / profile_name
-        / "python"
-        / "plugins"
+        / PROFILE_PLUGINS_DIR
         / plugin_slug_name
-        / "metadata.txt"
+        / PLUGIN_METADATA_FILENAME
     )
 
 
@@ -97,7 +102,7 @@ def get_installed_plugin_list(
     ini_parser.optionxform = str  # str = case-sensitive option names
     ini_parser.read(get_profile_qgis_ini_path(profile_name))
     try:
-        plugins_in_profile = dict(ini_parser.items("PythonPlugins"))
+        plugins_in_profile = dict(ini_parser.items(QGIS_SETTINGS_PLUGINS_SECTION))
     except NoSectionError:
         plugins_in_profile = {}
 
@@ -124,7 +129,7 @@ def get_installed_plugin_metadata(
     plg_metadata_path = get_profile_plugin_metadata_path(profile_name, plugin_slug_name)
     ini_parser.read(plg_metadata_path)
     try:
-        metadata = dict(ini_parser.items("general"))
+        metadata = dict(ini_parser.items(PLUGIN_METADATA_SECTION))
         metadata["folder_name"] = plg_metadata_path.parent.name
     except NoSectionError:
         metadata = {}

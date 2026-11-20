@@ -3,6 +3,7 @@ from shutil import copy
 
 from qgis.core import Qgis, QgsStyle
 
+from profile_manager.constants import PROFILE_STYLE_DB_FILENAME
 from profile_manager.exceptions import (
     InvalidItemError,
     ItemImportError,
@@ -115,8 +116,8 @@ def import_style_items(source_profile_path: Path, target_profile_path: Path) -> 
     :raises ItemImportError: if an item's tags or favorite mark cannot be written to
         the target
     """
-    source_db_path = source_profile_path / "symbology-style.db"
-    target_db_path = target_profile_path / "symbology-style.db"
+    source_db_path = source_profile_path / PROFILE_STYLE_DB_FILENAME
+    target_db_path = target_profile_path / PROFILE_STYLE_DB_FILENAME
 
     # checked here so that both branches below raise the same exception
     if not source_db_path.is_file():
