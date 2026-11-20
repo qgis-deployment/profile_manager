@@ -10,6 +10,16 @@ from typing import Tuple
 
 # -- QGIS profile layout (relative to a profile folder) --
 PROFILE_BOOKMARKS_FILENAME: str = "bookmarks.xml"
+# icon lookup from QgsUserProfile::icon() the first foufnd file wins
+PROFILE_ICON_STEM: str = "icon"
+PROFILE_ICON_EXTENSIONS: Tuple[str, ...] = (
+    ".svg",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".bmp",
+)
 PROFILE_MODELS_DIR: Path = Path("processing", "models")
 PROFILE_MODELS_GLOB: str = "*.model3"
 PROFILE_PLUGINS_DIR: Path = Path("python", "plugins")

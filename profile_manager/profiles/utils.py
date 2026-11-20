@@ -16,6 +16,8 @@ from qgis.utils import iface
 from profile_manager.constants import (
     PLUGIN_METADATA_FILENAME,
     PLUGIN_METADATA_SECTION,
+    PROFILE_ICON_EXTENSIONS,
+    PROFILE_ICON_STEM,
     PROFILE_PLUGINS_DIR,
     QGIS3_CUSTOMIZATION_FILENAME,
     QGIS4_CUSTOMIZATION_FILENAME,
@@ -67,6 +69,26 @@ def get_profile_qgis_ini_path(profile_name: str) -> Path:
     :rtype: Path
     """
     return qgis_profiles_path() / profile_name / get_qgis_ini_relative_path()
+
+
+def get_profile_icon_path(profile_name: str) -> Optional[Path]:
+    """Get the icon file path of a profile, with the same lookup as
+    QgsUserProfile::icon().
+
+    The first existing icon.<ext> file in the profile folder is used.
+
+    :param profile_name: profile name
+    :type profile_name: str
+
+    :return: icon file path, None if the profile has no custom icon
+    :rtype: Optional[Path]
+    """
+    profile_path = qgis_profiles_path() / profile_name
+    for extension in PROFILE_ICON_EXTENSIONS:
+        icon_path = profile_path / f"{PROFILE_ICON_STEM}{extension}"
+        if icon_path.is_file():
+            return icon_path
+    return None
 
 
 def get_qgis_customization_relative_path() -> Path:
