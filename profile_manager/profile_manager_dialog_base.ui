@@ -409,6 +409,9 @@
             <property name="storageMode">
              <enum>QgsFileWidget::GetDirectory</enum>
             </property>
+            <property name="options">
+             <set>QFileDialog::ShowDirsOnly</set>
+            </property>
            </widget>
           </item>
           <item row="0" column="0" rowspan="2" colspan="2">
@@ -478,7 +481,11 @@
            </widget>
           </item>
           <item row="4" column="1">
-           <widget class="QLineEdit" name="qdt_email_edit"/>
+           <widget class="QLineEdit" name="qdt_email_edit">
+            <property name="placeholderText">
+             <string notr="true">gis-team@example.org</string>
+            </property>
+           </widget>
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="qdt_author_label">
@@ -527,6 +534,9 @@
             <property name="acceptRichText">
              <bool>false</bool>
             </property>
+            <property name="placeholderText">
+             <string>Purpose and content of the profile, shown to end users</string>
+            </property>
            </widget>
           </item>
           <item row="8" column="0">
@@ -554,7 +564,11 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QLineEdit" name="qdt_author_edit"/>
+           <widget class="QLineEdit" name="qdt_author_edit">
+            <property name="placeholderText">
+             <string>GIS team</string>
+            </property>
+           </widget>
           </item>
           <item row="5" column="0">
            <widget class="QLabel" name="qdt_version_label">
@@ -564,7 +578,11 @@
            </widget>
           </item>
           <item row="5" column="1">
-           <widget class="QLineEdit" name="qdt_version_edit"/>
+           <widget class="QLineEdit" name="qdt_version_edit">
+            <property name="placeholderText">
+             <string notr="true">1.0.0</string>
+            </property>
+           </widget>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="qdt_description_label">
@@ -583,7 +601,11 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="qdt_qgis_min_version_edit"/>
+             <widget class="QLineEdit" name="qdt_qgis_min_version_edit">
+              <property name="placeholderText">
+               <string notr="true">3.40.4</string>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QLabel" name="qdt_qgis_max_version_label">
@@ -593,7 +615,11 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="qdt_qgis_max_version_edit"/>
+             <widget class="QLineEdit" name="qdt_qgis_max_version_edit">
+              <property name="placeholderText">
+               <string notr="true">4.99.16</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
