@@ -539,6 +539,49 @@
             </property>
            </widget>
           </item>
+          <item row="7" column="0">
+           <widget class="QLabel" name="qdt_icon_label">
+            <property name="text">
+             <string>Icon:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1">
+           <layout class="QHBoxLayout" name="qdt_icon_layout">
+            <item>
+             <widget class="QgsFileWidget" name="qdt_icon_widget">
+              <property name="toolTip">
+               <string>Icon used for the profile shortcuts. Defaults to the icon of the selected QGIS profile.</string>
+              </property>
+              <property name="filter">
+               <string>Images (*.svg *.png *.jpg *.jpeg *.gif *.bmp *.ico)</string>
+              </property>
+              <property name="storageMode">
+               <enum>QgsFileWidget::GetFile</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="qdt_icon_preview">
+              <property name="minimumSize">
+               <size>
+                <width>24</width>
+                <height>24</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>24</width>
+                <height>24</height>
+               </size>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
           <item row="8" column="0">
            <widget class="QLabel" name="qdt_required_legend">
             <property name="enabled">

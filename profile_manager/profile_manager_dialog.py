@@ -29,7 +29,10 @@ from profile_manager.gui.utils import (
     data_sources_as_tree,
     plugins_as_items,
 )
-from profile_manager.profiles.utils import get_current_profile_name
+from profile_manager.profiles.utils import (
+    get_current_profile_name,
+    get_profile_icon_path,
+)
 from profile_manager.qdt_export.models import QDTProfileInfos
 from profile_manager.qdt_export.profile_export import (
     export_profile_for_qdt,
@@ -118,8 +121,13 @@ class ProfileManagerDialog(QtWidgets.QDialog):
         self.export_qdt_button.setEnabled(False)
         self.__set_qdt_placeholders()
         self.__mark_qdt_required_fields()
+        # icon of the profile selected for export, used while the user keeps it
+        self._qdt_default_icon_path: str = ""
 
         self.__setup_connections()
+
+        # initialize QDT icon with the selected profile one
+        self._qdt_export_profile_changed()
 
     def __set_qdt_placeholders(self) -> None:
         """Set placeholders on QDT file widgets, not settable from the .ui file.
@@ -171,6 +179,10 @@ class ProfileManagerDialog(QtWidgets.QDialog):
         self.export_qdt_button.clicked.connect(self.export_qdt_handler)
         self.qdt_file_widget.fileChanged.connect(self._qdt_export_dir_changed)
         self.qdt_import_file_widget.fileChanged.connect(self._qdt_import_file_changed)
+        self.qdt_export_profile_cbx.currentTextChanged.connect(
+            self._qdt_export_profile_changed
+        )
+        self.qdt_icon_widget.fileChanged.connect(self._qdt_icon_changed)
 
         # checkbox
         self.checkBox_checkAll.stateChanged.connect(self.__toggle_all_items)
@@ -225,6 +237,37 @@ class ProfileManagerDialog(QtWidgets.QDialog):
         """Enable export button only when an export folder is defined"""
         self.export_qdt_button.setEnabled(bool(self.qdt_file_widget.filePath()))
 
+    def _qdt_export_profile_changed(self) -> None:
+        """Use the icon of the profile selected for export as default QDT icon."""
+        new_default_icon_path = ""
+
+        # get path of the selected profile's icon
+        if profile_icon_path := get_profile_icon_path(
+            self.qdt_export_profile_cbx.currentText()
+        ):
+            new_default_icon_path = str(profile_icon_path)
+
+        current_icon_path = self.qdt_icon_widget.filePath()
+
+        if current_icon_path in ("", self._qdt_default_icon_path):
+            self.qdt_icon_widget.setFilePath(new_default_icon_path)
+
+        self._qdt_default_icon_path = new_default_icon_path
+
+    def _qdt_icon_changed(self) -> None:
+        """Display a preview of the QDT icon next to its path."""
+        icon_path = Path(self.qdt_icon_widget.filePath())
+        if icon_path.is_file():
+            self.qdt_icon_preview.setPixmap(
+                QIcon(str(icon_path)).pixmap(self.qdt_icon_preview.size())
+            )
+            self.qdt_icon_preview.setToolTip(str(icon_path))
+        else:
+            self.qdt_icon_preview.clear()
+            self.qdt_icon_preview.setToolTip(
+                self.tr("No icon") if not icon_path.name else self.tr("File not found")
+            )
+
     def _qdt_import_file_changed(self) -> None:
         """Fill the QDT form with the metadata of the selected QDT profile file"""
         profile_json = Path(self.qdt_import_file_widget.filePath())
@@ -268,6 +311,7 @@ class ProfileManagerDialog(QtWidgets.QDialog):
             description=self.qdt_description_edit.toPlainText(),
             author=self.qdt_author_edit.text(),
             email=self.qdt_email_edit.text(),
+            icon=self.qdt_icon_widget.filePath(),
             version=self.qdt_version_edit.text(),
             qgis_min_version=self.qdt_qgis_min_version_edit.text(),
             qgis_max_version=self.qdt_qgis_max_version_edit.text(),
@@ -282,6 +326,10 @@ class ProfileManagerDialog(QtWidgets.QDialog):
         self.qdt_description_edit.setPlainText(qdt_profile_infos.description)
         self.qdt_author_edit.setText(qdt_profile_infos.author)
         self.qdt_email_edit.setText(qdt_profile_infos.email)
+        # if the imported file is no usabe, fall back to the default one
+        self.qdt_icon_widget.setFilePath(
+            qdt_profile_infos.icon or self._qdt_default_icon_path
+        )
         self.qdt_version_edit.setText(qdt_profile_infos.version)
         self.qdt_qgis_min_version_edit.setText(qdt_profile_infos.qgis_min_version)
         self.qdt_qgis_max_version_edit.setText(qdt_profile_infos.qgis_max_version)
