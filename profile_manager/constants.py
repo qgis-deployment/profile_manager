@@ -3,6 +3,7 @@
 """Static values shared across the plugin."""
 
 # standard
+import re
 from pathlib import Path
 from typing import Tuple
 
@@ -18,7 +19,7 @@ PROFILE_STYLE_DB_FILENAME: str = "symbology-style.db"
 PYTHON_FILES_GLOB: str = "*.py"
 
 # validation rule from QgsUserProfileSelectionDialog
-PROFILE_NAME_PATTERN: str = r"[^/\\]+"
+PROFILE_NAME_RE: re.Pattern = re.compile(r"[^/\\]+")
 
 # -- QGIS UI customization file, stored next to the settings INI file --
 QGIS3_CUSTOMIZATION_FILENAME: str = "QGISCUSTOMIZATION3.ini"
