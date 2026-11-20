@@ -4,7 +4,7 @@ from qgis.PyQt.QtGui import QRegularExpressionValidator
 from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QLineEdit, QVBoxLayout
 
 # plugin
-from profile_manager.constants import PROFILE_NAME_PATTERN
+from profile_manager.constants import PROFILE_NAME_RE
 
 
 class NameProfileDialog(QDialog):
@@ -26,7 +26,7 @@ class NameProfileDialog(QDialog):
         self.text_input = QLineEdit()
         self.text_input.setPlaceholderText(self.tr("Profile Name"))
         self.text_input.setValidator(
-            QRegularExpressionValidator(QRegularExpression(PROFILE_NAME_PATTERN))
+            QRegularExpressionValidator(QRegularExpression(PROFILE_NAME_RE.pattern))
         )
 
         self.button_box = (

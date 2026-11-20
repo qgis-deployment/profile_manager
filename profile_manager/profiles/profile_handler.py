@@ -2,7 +2,6 @@
 
 # standard lib
 import errno
-import re
 from os import rename
 from pathlib import Path
 from shutil import copytree, rmtree
@@ -11,7 +10,7 @@ from shutil import copytree, rmtree
 from qgis.core import QgsApplication, QgsError, QgsUserProfileManager
 
 # plugin
-from profile_manager.constants import PROFILE_NAME_PATTERN
+from profile_manager.constants import PROFILE_NAME_RE
 from profile_manager.profiles.utils import (
     get_profile_qgis_ini_path,
     qgis_profiles_path,
@@ -22,7 +21,7 @@ def create_profile(profile_name: str):
     """Creates new profile"""
     if not profile_name:
         raise ValueError("Empty profile name provided")
-    if not re.match(PROFILE_NAME_PATTERN, profile_name):
+    if not PROFILE_NAME_RE.fullmatch(profile_name):
         raise ValueError("Invalid profile name")
 
     # Unfortunately QgsUserProfileManager.createUserProfile() does not notice if
@@ -49,7 +48,7 @@ def remove_profile(profile_name: str):
     """Removes profile"""
     if not profile_name:
         raise ValueError("Empty profile name provided")
-    if not re.match(PROFILE_NAME_PATTERN, profile_name):
+    if not PROFILE_NAME_RE.fullmatch(profile_name):
         raise ValueError("Invalid profile name")
     if profile_name == Path(QgsApplication.qgisSettingsDirPath()).name:
         raise ValueError("Cannot remove the profile that is currently active")
@@ -69,9 +68,9 @@ def copy_profile(source_profile_name: str, target_profile_name: str):
         raise ValueError("Empty source profile name provided")
     if not target_profile_name:
         raise ValueError("Empty target profile name provided")
-    if not re.match(PROFILE_NAME_PATTERN, source_profile_name):
+    if not PROFILE_NAME_RE.fullmatch(source_profile_name):
         raise ValueError("Invalid source profile name")
-    if not re.match(PROFILE_NAME_PATTERN, target_profile_name):
+    if not PROFILE_NAME_RE.fullmatch(target_profile_name):
         raise ValueError("Invalid target profile name")
     if source_profile_name == target_profile_name:
         raise ValueError("Cannot copy profile to itself")
@@ -92,13 +91,13 @@ def rename_profile(old_profile_name: str, new_profile_name: str):
     """Renames profile to new name."""
     if not old_profile_name:
         raise ValueError("Empty old profile name provided")
-    if not old_profile_name:
+    if not new_profile_name:
         raise ValueError("Empty new profile name provided")
     if old_profile_name == new_profile_name:
         raise ValueError("New name is identical to old name")
-    if not re.match(PROFILE_NAME_PATTERN, old_profile_name):
+    if not PROFILE_NAME_RE.fullmatch(old_profile_name):
         raise ValueError("Invalid old profile name")
-    if not re.match(PROFILE_NAME_PATTERN, new_profile_name):
+    if not PROFILE_NAME_RE.fullmatch(new_profile_name):
         raise ValueError("Invalid new profile name")
     if old_profile_name == Path(QgsApplication.qgisSettingsDirPath()).name:
         raise ValueError("Cannot rename the profile that is currently active")
