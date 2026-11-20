@@ -22,7 +22,7 @@ PROFILE_NAME_PATTERN: str = r"[^/\\]+"
 
 # -- QGIS UI customization file, stored next to the settings INI file --
 QGIS3_CUSTOMIZATION_FILENAME: str = "QGISCUSTOMIZATION3.ini"
-QGIS4_CUSTOMIZATION_FILENAME: str = "QGISCUSTOMIZATION4.xml"
+QGIS4_CUSTOMIZATION_FILENAME: str = "QGISCUSTOMIZATION.xml"
 
 # -- QGIS settings (QGIS3/4.ini...) sections and keys --
 QGIS_SETTINGS_CUSTOMIZATION_ENABLED_KEY: str = "UI/Customization/enabled"

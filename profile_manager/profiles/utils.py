@@ -17,6 +17,8 @@ from profile_manager.constants import (
     PLUGIN_METADATA_FILENAME,
     PLUGIN_METADATA_SECTION,
     PROFILE_PLUGINS_DIR,
+    QGIS3_CUSTOMIZATION_FILENAME,
+    QGIS4_CUSTOMIZATION_FILENAME,
     QGIS_SETTINGS_PLUGINS_SECTION,
 )
 from profile_manager.qdt_export.models import QdtPluginInformation
@@ -65,6 +67,19 @@ def get_profile_qgis_ini_path(profile_name: str) -> Path:
     :rtype: Path
     """
     return qgis_profiles_path() / profile_name / get_qgis_ini_relative_path()
+
+
+def get_qgis_customization_relative_path() -> Path:
+    """Get the UI customization file path relative to a profile folder.
+
+    :return: relative path
+    :rtype: Path
+    """
+    if Qgis.QGIS_VERSION_INT >= 40000:
+        filename = QGIS4_CUSTOMIZATION_FILENAME
+    else:
+        filename = QGIS3_CUSTOMIZATION_FILENAME
+    return get_qgis_ini_relative_path().parent / filename
 
 
 def get_profile_plugin_metadata_path(profile_name: str, plugin_slug_name: str) -> Path:
