@@ -116,9 +116,22 @@ class ProfileManagerDialog(QtWidgets.QDialog):
             version_edit.setMaxLength(QDT_VERSION_MAX_LENGTH)
 
         self.export_qdt_button.setEnabled(False)
+        self.__set_qdt_placeholders()
         self.__mark_qdt_required_fields()
 
         self.__setup_connections()
+
+    def __set_qdt_placeholders(self) -> None:
+        """Set placeholders on QDT file widgets, not settable from the .ui file.
+
+        Other QDT form fields placeholders are defined in the .ui file.
+        """
+        self.qdt_import_file_widget.lineEdit().setPlaceholderText(
+            self.tr("Optional: path to an existing profile.json")
+        )
+        self.qdt_file_widget.lineEdit().setPlaceholderText(
+            self.tr("Folder where the QDT profile will be written")
+        )
 
     def __mark_qdt_required_fields(self) -> None:
         """Flag QDT form fields required by the QDT profile schema.
