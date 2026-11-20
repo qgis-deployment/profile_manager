@@ -91,7 +91,7 @@ def rename_profile(old_profile_name: str, new_profile_name: str):
     """Renames profile to new name."""
     if not old_profile_name:
         raise ValueError("Empty old profile name provided")
-    if not old_profile_name:
+    if not new_profile_name:
         raise ValueError("Empty new profile name provided")
     if old_profile_name == new_profile_name:
         raise ValueError("New name is identical to old name")
