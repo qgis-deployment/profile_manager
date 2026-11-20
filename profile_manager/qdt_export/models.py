@@ -54,9 +54,11 @@ class QdtPluginInformation:
 class QDTProfileInfos:
     """Store informations for QDT profile creation"""
 
-    description: str = ""
     author: str = ""
+    description: str = ""
     email: str = ""
-    version: str = ""
+    folder_name: str = ""
+    name: str = ""
     qgis_min_version: str = ""
     qgis_max_version: str = ""
+    version: str = ""

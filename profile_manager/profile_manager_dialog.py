@@ -10,7 +10,6 @@ from qgis.PyQt.QtGui import QDesktopServices, QIcon
 from qgis.PyQt.QtWidgets import (
     QDialog,
     QDialogButtonBox,
-    QLabel,
     QListWidget,
     QMessageBox,
     QTreeWidget,
@@ -23,6 +22,8 @@ from profile_manager.gui.mdl_profiles import ProfileListModel
 from profile_manager.gui.name_profile_dialog import NameProfileDialog
 from profile_manager.gui.utils import (
     QVAL_EMAIL,
+    QVAL_VERSION,
+    VERSION_MAX_LENGTH,
     data_sources_as_tree,
     plugins_as_items,
 )
@@ -104,6 +105,13 @@ class ProfileManagerDialog(QtWidgets.QDialog):
         # tab2: QDT export
         self.qdt_export_profile_cbx.setModel(self.profile_mdl)
         self.qdt_email_edit.setValidator(QVAL_EMAIL)
+        for version_edit in (
+            self.qdt_version_edit,
+            self.qdt_qgis_min_version_edit,
+            self.qdt_qgis_max_version_edit,
+        ):
+            version_edit.setValidator(QVAL_VERSION)
+            version_edit.setMaxLength(VERSION_MAX_LENGTH)
 
         self.export_qdt_button.setEnabled(False)
         self.__mark_qdt_required_fields()
@@ -123,10 +131,6 @@ class ProfileManagerDialog(QtWidgets.QDialog):
             label.setText(f"{label.text()} *")
             label.setToolTip(required_tooltip)
             edit.setToolTip(required_tooltip)
-
-        legend = QLabel(self.tr("* Required fields"), self)
-        legend.setEnabled(False)  # greyed out, like a hint
-        self.gridLayout.addWidget(legend, 10, 0, 1, 2)
 
     def __setup_connections(self) -> None:
         """Set up connections"""
@@ -151,6 +155,7 @@ class ProfileManagerDialog(QtWidgets.QDialog):
 
         self.export_qdt_button.clicked.connect(self.export_qdt_handler)
         self.qdt_file_widget.fileChanged.connect(self._qdt_export_dir_changed)
+        self.qdt_import_file_widget.fileChanged.connect(self._qdt_import_file_changed)
 
         # checkbox
         self.checkBox_checkAll.stateChanged.connect(self.__toggle_all_items)
@@ -202,20 +207,41 @@ class ProfileManagerDialog(QtWidgets.QDialog):
         return None
 
     def _qdt_export_dir_changed(self) -> None:
-        """Update UI when QDT export dir is changed:
-        - enabled/disable button
-        - define QDTProfileInformations if profile.json file is available
+        """Enable export button only when an export folder is defined"""
+        self.export_qdt_button.setEnabled(bool(self.qdt_file_widget.filePath()))
+
+    def _qdt_import_file_changed(self) -> None:
+        """Fill the QDT form with the metadata of the selected profile.json"""
+        profile_json = Path(self.qdt_import_file_widget.filePath())
+        if not profile_json.is_file():
+            return
+        try:
+            qdt_profile_infos = get_qdt_profile_infos_from_file(profile_json)
+            self._set_qdt_profile_infos(qdt_profile_infos)
+            self._select_qdt_export_profile(qdt_profile_infos)
+        except (OSError, ValueError) as err:
+            QMessageBox.warning(
+                self,
+                self.tr("QDT profile import"),
+                self.tr("Unable to read QDT profile {path}:\n{error}").format(
+                    path=profile_json, error=err
+                ),
+            )
+
+    def _select_qdt_export_profile(self, qdt_profile_infos: QDTProfileInfos) -> None:
+        """Point the export profile combobox to the profile matching the imported
+        profile.json, if it exists locally.
+
+        Args:
+            qdt_profile_infos (QDTProfileInfos): QDT Profile Information
         """
-        export_dir = self.qdt_file_widget.filePath()
-        if export_dir:
-            self.export_qdt_button.setEnabled(True)
-            profile_json = Path(export_dir) / "profile.json"
-            if profile_json.exists():
-                self._set_qdt_profile_infos(
-                    get_qdt_profile_infos_from_file(profile_json)
-                )
-        else:
-            self.export_qdt_button.setEnabled(False)
+        for candidate in (qdt_profile_infos.folder_name, qdt_profile_infos.name):
+            if not candidate:
+                continue
+            index = self.qdt_export_profile_cbx.findText(candidate)
+            if index >= 0:
+                self.qdt_export_profile_cbx.setCurrentIndex(index)
+                return
 
     def _get_qdt_profile_infos(self) -> QDTProfileInfos:
         """Get QDTProfileInfos from UI
