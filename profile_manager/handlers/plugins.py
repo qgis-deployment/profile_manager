@@ -73,7 +73,7 @@ def import_plugins(
         # We don't want to mix the source plugin with anything in the target directory,
         # so we delete that if it exists.
         if target_plugin_dir.is_dir():
-            target_plugin_dir.unlink()
+            rmtree(target_plugin_dir)
         # We don't need to check of the target profile already has a plugins directory,
         # because copytree automatically creates missing parent directories if needed.
         copytree(source_plugin_dir, target_plugin_dir)
