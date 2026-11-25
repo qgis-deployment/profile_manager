@@ -2,6 +2,7 @@ from pathlib import Path
 
 from qgis.PyQt.QtCore import QSettings
 
+from profile_manager.constants import QGIS_SETTINGS_FAVOURITES_KEY
 from profile_manager.toolbelt.log_handler import PlgLogger
 
 
@@ -28,12 +29,14 @@ def import_favourites(source_qgis_ini_file: Path, target_qgis_ini_file: Path):
     """
     source_settings = QSettings(str(source_qgis_ini_file), QSettings.Format.IniFormat)
     target_settings = QSettings(str(target_qgis_ini_file), QSettings.Format.IniFormat)
-    favourites = source_settings.value("browser/favourites")  # None if not exist
+    favourites = source_settings.value(
+        QGIS_SETTINGS_FAVOURITES_KEY
+    )  # None if not exist
     if favourites is None:
         logger.log("No favourites found in source profile")
         return
     else:
-        target_settings.setValue("browser/favourites", favourites)
+        target_settings.setValue(QGIS_SETTINGS_FAVOURITES_KEY, favourites)
         logger.log("Copying favourites to target profile")
 
     # writing the target file is handled by QSettings’s destructor

@@ -13,6 +13,16 @@ from qgis.PyQt.QtCore import QCoreApplication
 from qgis.utils import iface
 
 # plugin
+from profile_manager.constants import (
+    PLUGIN_METADATA_FILENAME,
+    PLUGIN_METADATA_SECTION,
+    PROFILE_ICON_EXTENSIONS,
+    PROFILE_ICON_STEM,
+    PROFILE_PLUGINS_DIR,
+    QGIS3_CUSTOMIZATION_FILENAME,
+    QGIS4_CUSTOMIZATION_FILENAME,
+    QGIS_SETTINGS_PLUGINS_SECTION,
+)
 from profile_manager.qdt_export.models import QdtPluginInformation
 from profile_manager.toolbelt import PlgLogger
 
@@ -61,6 +71,39 @@ def get_profile_qgis_ini_path(profile_name: str) -> Path:
     return qgis_profiles_path() / profile_name / get_qgis_ini_relative_path()
 
 
+def get_profile_icon_path(profile_name: str) -> Optional[Path]:
+    """Get the icon file path of a profile, with the same lookup as
+    QgsUserProfile::icon().
+
+    The first existing icon.<ext> file in the profile folder is used.
+
+    :param profile_name: profile name
+    :type profile_name: str
+
+    :return: icon file path, None if the profile has no custom icon
+    :rtype: Optional[Path]
+    """
+    profile_path = qgis_profiles_path() / profile_name
+    for extension in PROFILE_ICON_EXTENSIONS:
+        icon_path = profile_path / f"{PROFILE_ICON_STEM}{extension}"
+        if icon_path.is_file():
+            return icon_path
+    return None
+
+
+def get_qgis_customization_relative_path() -> Path:
+    """Get the UI customization file path relative to a profile folder.
+
+    :return: relative path
+    :rtype: Path
+    """
+    if Qgis.QGIS_VERSION_INT >= 40000:
+        filename = QGIS4_CUSTOMIZATION_FILENAME
+    else:
+        filename = QGIS3_CUSTOMIZATION_FILENAME
+    return get_qgis_ini_relative_path().parent / filename
+
+
 def get_profile_plugin_metadata_path(profile_name: str, plugin_slug_name: str) -> Path:
     """Get path to metadata.txt for a plugin inside a profile
 
@@ -74,10 +117,9 @@ def get_profile_plugin_metadata_path(profile_name: str, plugin_slug_name: str) -
     return (
         qgis_profiles_path()
         / profile_name
-        / "python"
-        / "plugins"
+        / PROFILE_PLUGINS_DIR
         / plugin_slug_name
-        / "metadata.txt"
+        / PLUGIN_METADATA_FILENAME
     )
 
 
@@ -97,7 +139,7 @@ def get_installed_plugin_list(
     ini_parser.optionxform = str  # str = case-sensitive option names
     ini_parser.read(get_profile_qgis_ini_path(profile_name))
     try:
-        plugins_in_profile = dict(ini_parser.items("PythonPlugins"))
+        plugins_in_profile = dict(ini_parser.items(QGIS_SETTINGS_PLUGINS_SECTION))
     except NoSectionError:
         plugins_in_profile = {}
 
@@ -124,7 +166,7 @@ def get_installed_plugin_metadata(
     plg_metadata_path = get_profile_plugin_metadata_path(profile_name, plugin_slug_name)
     ini_parser.read(plg_metadata_path)
     try:
-        metadata = dict(ini_parser.items("general"))
+        metadata = dict(ini_parser.items(PLUGIN_METADATA_SECTION))
         metadata["folder_name"] = plg_metadata_path.parent.name
     except NoSectionError:
         metadata = {}

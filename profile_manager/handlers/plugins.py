@@ -6,6 +6,10 @@ from qgis.core import Qgis
 from qgis.PyQt.QtCore import QSettings
 from qgis.utils import findPlugins
 
+from profile_manager.constants import (
+    PROFILE_PLUGINS_DIR,
+    QGIS_SETTINGS_PLUGINS_SECTION,
+)
 from profile_manager.toolbelt import PlgLogger
 
 
@@ -15,7 +19,7 @@ logger = PlgLogger()
 def collect_plugin_names(profile_path: Path) -> list[str]:
     """Returns the directory names of installed plugins in the profile directory."""
     logger.log(f"Collecting plugin names from  {profile_path}")
-    plugins_directory = profile_path / "python" / "plugins"
+    plugins_directory = profile_path / PROFILE_PLUGINS_DIR
     installed_plugins = [p for p, _ in findPlugins(str(plugins_directory))]
     return sorted(installed_plugins)
 
@@ -59,17 +63,17 @@ def import_plugins(
     start_time = datetime.now()
 
     target_settings = QSettings(str(target_qgis_ini_file), QSettings.Format.IniFormat)
-    target_settings.beginGroup("PythonPlugins")
+    target_settings.beginGroup(QGIS_SETTINGS_PLUGINS_SECTION)
 
     for plugin_name in plugin_names:
-        source_plugin_dir = source_profile_path / "python" / "plugins" / plugin_name
-        target_plugin_dir = target_profile_path / "python" / "plugins" / plugin_name
+        source_plugin_dir = source_profile_path / PROFILE_PLUGINS_DIR / plugin_name
+        target_plugin_dir = target_profile_path / PROFILE_PLUGINS_DIR / plugin_name
 
         # Copy the plugin to the target profile
         # We don't want to mix the source plugin with anything in the target directory,
         # so we delete that if it exists.
         if target_plugin_dir.is_dir():
-            target_plugin_dir.unlink()
+            rmtree(target_plugin_dir, ignore_errors=True)
         # We don't need to check of the target profile already has a plugins directory,
         # because copytree automatically creates missing parent directories if needed.
         copytree(source_plugin_dir, target_plugin_dir)
@@ -106,11 +110,11 @@ def remove_plugins(
     start_time = datetime.now()
 
     settings = QSettings(str(qgis_ini_file), QSettings.Format.IniFormat)
-    settings.beginGroup("PythonPlugins")  # will be created as needed
+    settings.beginGroup(QGIS_SETTINGS_PLUGINS_SECTION)  # will be created as needed
 
     for plugin_name in plugin_names:
         # Remove plugin directory
-        plugin_dir = profile_path / "python" / "plugins" / plugin_name
+        plugin_dir = profile_path / PROFILE_PLUGINS_DIR / plugin_name
         rmtree(plugin_dir)
 
         # Remove plugin from active state list in PythonPlugins section

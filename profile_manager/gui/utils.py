@@ -3,6 +3,9 @@ from qgis.PyQt.QtCore import QRegularExpression, Qt
 from qgis.PyQt.QtGui import QRegularExpressionValidator
 from qgis.PyQt.QtWidgets import QListWidgetItem, QTreeWidgetItem
 
+# plugin
+from profile_manager.constants import QDT_VERSION_PATTERN
+
 
 # -- VALIDATORS
 
@@ -13,13 +16,9 @@ _email_qreg = QRegularExpression(
 )
 QVAL_EMAIL = QRegularExpressionValidator(_email_qreg)
 
-# versions: same pattern as QDT profile schema (qgis_profile.json
+# versions: same pattern as QDT profile schema (qgis_profile.json)
 # SemVer x.y.z recommended, x.y accepted.
-VERSION_MAX_LENGTH: int = 14
-_version_qreg = QRegularExpression(
-    r"^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*))?$"
-)
-QVAL_VERSION = QRegularExpressionValidator(_version_qreg)
+QVAL_VERSION = QRegularExpressionValidator(QRegularExpression(QDT_VERSION_PATTERN))
 
 
 def data_sources_as_tree(
