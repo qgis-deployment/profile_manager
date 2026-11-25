@@ -10,6 +10,7 @@ from qgis.PyQt.QtGui import QDesktopServices, QIcon
 from qgis.PyQt.QtWidgets import (
     QDialog,
     QDialogButtonBox,
+    QFileDialog,
     QListWidget,
     QMessageBox,
     QTreeWidget,
@@ -140,6 +141,9 @@ class ProfileManagerDialog(QtWidgets.QDialog):
         self.qdt_file_widget.lineEdit().setPlaceholderText(
             self.tr("Folder where the QDT profile will be written")
         )
+        # set here and not in the .ui because PyQt6 uic can't find it
+        # QFileDialog::ShowDirsOnly flag (QGIS 4/Qt 6)
+        self.qdt_file_widget.setOptions(QFileDialog.Option.ShowDirsOnly)
 
     def __mark_qdt_required_fields(self) -> None:
         """Flag QDT form fields required by the QDT profile schema.
