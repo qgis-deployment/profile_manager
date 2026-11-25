@@ -16,6 +16,21 @@ Unreleased
 
 -->
 
+## 0.10.0 - 2026-11-25
+
+* fix(profiles): validate whole profile name against forbidden characters by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/172>
+* fix(plugins): pathlib.unlink does not remove folders by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/173>
+* fix(qgis): in QGIS 4, customization file is now a XML by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/170>
+* add(ui): author field to QDT form by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/158>
+* improve(ui): mark required field with a '*' in QDT form by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/159>
+* improve(ui): enforce email compliance by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/161>
+* improve(qdt): split import and export buttons by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/165>
+* improve(qdt): select imported profile if it does exist locally by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/166>
+* improve(qdt): validate versions field against SemVer by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/168>
+* improve(qdt): add placeholders by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/174>
+* feature(qdt): support profile icon by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/175>
+* refactoring(constants): move static variables and external (QGIS, QDT) settings to constants module by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/169>
+
 ## 0.9.0 - 2026-10-22
 
 * improve(compatibility): resolve path to the profile QGIS*.ini file using dynamic variables by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/152>
