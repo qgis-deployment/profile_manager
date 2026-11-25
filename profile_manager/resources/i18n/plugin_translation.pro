@@ -1,6 +1,7 @@
 FORMS =	../../profile_manager_dialog_base.ui
 
 SOURCES =	../../constants.py \
+	../../exceptions.py \
 	../../gui/mdl_profiles.py \
 	../../gui/name_profile_dialog.py \
 	../../gui/utils.py \
