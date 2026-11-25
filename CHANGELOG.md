@@ -16,6 +16,11 @@ Unreleased
 
 -->
 
+## 0.10.1 - 2026-11-25
+
+* fix(compatibility): options of QgsFileWidget are not handled correctly in QGIS 4 (Qt 6) by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/176>
+* update(i18n): complete French translations for 0.10.1 version by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/177>
+
 ## 0.10.0 - 2026-11-25
 
 * fix(profiles): validate whole profile name against forbidden characters by @Guts in <https://github.com/qgis-deployment/profile_manager/pull/172>
